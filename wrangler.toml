@@ -1,0 +1,6 @@
+[build]
+command = "python build-search-index.py && hugo --minify"
+destination = "public"
+
+[build.environment]
+HUGO_VERSION = "0.145.0"
