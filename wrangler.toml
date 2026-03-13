@@ -1,8 +1,0 @@
-name = "ishistory"
-pages_build_output_dir = "public"
-
-[build]
-command = "python build-search-index.py && hugo --minify"
-
-[build.environment]
-HUGO_VERSION = "0.145.0"
