@@ -4,6 +4,8 @@ title = "ishistory"
 enableRobotsTXT = true
 enableGitInfo = false
 
+ignoredFrontMatterFields = ["published"]
+
 [markup.goldmark.renderer]
   unsafe = true
 
