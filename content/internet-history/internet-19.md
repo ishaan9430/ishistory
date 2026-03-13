@@ -9,7 +9,6 @@ tag: "Social Media"
 description: "When anyone could broadcast to the world — how three PayPal employees built the platform that replaced television for an entire generation."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

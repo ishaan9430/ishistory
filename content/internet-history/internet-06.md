@@ -9,7 +9,6 @@ tag: "Infrastructure"
 description: "The vast physical infrastructure of the internet: thousands of miles of cable on the ocean floor carrying almost all of the world's data."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

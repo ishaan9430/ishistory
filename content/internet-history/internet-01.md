@@ -9,7 +9,6 @@ tag: "Prehistory"
 description: "Telegraph, telephone, and the dream of a global network — the long prehistory of connected communication that made the internet inevitable."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

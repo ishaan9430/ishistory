@@ -9,7 +9,6 @@ tag: "Culture"
 description: "The impossible encyclopedia that actually worked — and what it says about human collaboration, knowledge, and the open web."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

@@ -9,7 +9,6 @@ tag: "Future"
 description: "Spatial computing, the open web movement, and the internet's unfinished story — where it goes from here, and who gets to decide."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

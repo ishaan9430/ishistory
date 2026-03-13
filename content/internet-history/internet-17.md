@@ -9,7 +9,6 @@ tag: "Culture"
 description: "Napster, BitTorrent, and the copyright wars that forced every media industry to reinvent itself — or die trying."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

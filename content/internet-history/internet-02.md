@@ -9,7 +9,6 @@ tag: "Cold War"
 description: "The Cold War military project that accidentally invented the internet — and why its creators had no idea what they'd built."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

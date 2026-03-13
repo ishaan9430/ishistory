@@ -9,7 +9,6 @@ tag: "Mobile"
 description: "How the iPhone rewired everything — the shift from desktop to pocket and what it meant for attention, design, and power."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

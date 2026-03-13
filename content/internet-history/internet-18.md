@@ -9,7 +9,6 @@ tag: "Social Media"
 description: "From Friendster to MySpace to Facebook — the strange, competitive early history of the platforms that rewired human social life."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*
