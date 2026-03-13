@@ -89,7 +89,7 @@ const SERIES_LABELS = {
 
 let searchIndex = [];
 fetch('/search-index.json').then(r => r.json()).then(data => {
-  searchIndex = data.filter(e => e.published);
+  searchIndex = data;
   const q = new URLSearchParams(window.location.search).get('q');
   if (q) { document.getElementById('searchInput').value = q; doSearch(q); }
 });
