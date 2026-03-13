@@ -9,7 +9,6 @@ tag: "Industry"
 description: "How Amazon's acquisition of Kiva Systems and the rise of warehouse automation transformed global logistics and e-commerce."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

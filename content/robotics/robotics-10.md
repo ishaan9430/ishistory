@@ -9,7 +9,6 @@ tag: "Medicine"
 description: "The da Vinci surgical system, robotic prosthetics, and how machines entered the operating room to assist — and sometimes replace — human hands."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

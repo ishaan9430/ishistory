@@ -9,7 +9,6 @@ tag: "Psychology"
 description: "Why almost-human robots make us deeply uncomfortable — the neuroscience and psychology behind one of robotics' most famous phenomena."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

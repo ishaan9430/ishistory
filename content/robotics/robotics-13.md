@@ -9,7 +9,6 @@ tag: "Technology"
 description: "From military UAVs to Amazon delivery to disaster response — the rise of unmanned aerial vehicles and what they mean for society."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

@@ -9,7 +9,6 @@ tag: "Ethics"
 description: "From bomb disposal units in Iraq to autonomous drone swarms — the history, ethics, and future of robots on the battlefield."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

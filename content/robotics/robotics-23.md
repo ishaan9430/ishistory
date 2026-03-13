@@ -9,7 +9,6 @@ tag: "Engineering"
 description: "Machines made of flexible, compliant materials inspired by biology — and why they may be better suited to the real world than rigid robots."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

@@ -9,7 +9,6 @@ tag: "Technology"
 description: "Figure, Tesla Optimus, Boston Dynamics Atlas, Agility Robotics Digit — the fierce competition to build a robot that can work alongside humans."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

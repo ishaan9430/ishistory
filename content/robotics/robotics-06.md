@@ -9,7 +9,6 @@ tag: "Industry"
 description: "The story of Unimate, the first industrial robot arm, and how a partnership with General Motors changed manufacturing forever."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

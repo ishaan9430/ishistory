@@ -9,7 +9,6 @@ tag: "Ancient History"
 description: "Ancient automata, clockwork knights, and the earliest human attempts to create artificial beings. From Greek myths to Renaissance engineering marvels."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*
