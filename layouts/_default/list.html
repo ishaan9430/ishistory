@@ -1,6 +1,6 @@
 {{ $seriesKey := .Section }}
 {{ $seriesMeta := index site.Data.series $seriesKey }}
-{{ $published := where .Pages "Params.draft" false }}
+{{ $published := where .Pages "Params.coming_soon" false }}
 {{ $allPages := .Pages }}
 
 <!DOCTYPE html>
@@ -170,8 +170,8 @@
       </div>
       <div class="episodes-grid">
         {{ range $eps }}
-        <a href="{{ if not .Params.draft }}{{ .RelPermalink }}{{ else }}#{{ end }}"
-           class="episode-card{{ if .Params.draft }} coming-soon{{ end }}">
+        <a href="{{ if not .Params.coming_soon }}{{ .RelPermalink }}{{ else }}#{{ end }}"
+           class="episode-card{{ if .Params.coming_soon }} coming-soon{{ end }}">
           <div class="episode-roman">{{ .Params.roman }}</div>
           <div>
             <div class="episode-tag">{{ .Params.tag | default "Episode" }}</div>
