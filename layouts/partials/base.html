@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ block "title" . }}{{ .Site.Title }}{{ end }}</title>
+{{ $desc := .Params.description | default .Site.Params.description }}
+<meta name="description" content="{{ $desc }}">
+<link rel="canonical" href="{{ .Permalink }}">
+
+<meta property="og:type" content="{{ block "og_type" . }}website{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="ishistory">
+<meta property="og:title" content="{{ block "og_title" . }}{{ .Site.Title }}{{ end }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:image" content="{{ .Site.BaseURL }}og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ block "og_title" . }}{{ .Site.Title }}{{ end }}">
+<meta name="twitter:description" content="{{ $desc }}">
+<meta name="twitter:image" content="{{ .Site.BaseURL }}og-image.png">
+
+<meta name="author" content="{{ .Site.Params.author }}">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#080b14">
+<link rel="alternate" type="application/rss+xml" title="ishistory" href="/feed.xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@300;400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/main.css">
+{{ block "head_extra" . }}{{ end }}
+
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ .Site.Params.googleAnalytics }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","{{ .Site.Params.googleAnalytics }}");</script>
+</head>
+<body>
+
+<div class="cosmos">
+  <div class="cosmos-base"></div>
+  <div class="cosmos-nebula-1"></div>
+  <div class="cosmos-nebula-2"></div>
+  <div class="cosmos-nebula-3"></div>
+  <div class="cosmos-stars"></div>
+  <div class="cosmos-grain"></div>
+</div>
+
+<div class="nav-drawer" id="navDrawer">
+  {{ block "nav_drawer_links" . }}
+  <a href="/#episodes" onclick="closeNav()">Episodes</a>
+  <a href="/search/" onclick="closeNav()">Search</a>
+  <a href="/#about" onclick="closeNav()">About</a>
+  {{ end }}
+</div>
+
+<nav id="mainNav">
+  <a href="/" class="nav-logo">is<span>history</span></a>
+  <ul class="nav-links">
+    {{ block "nav_links" . }}
+    <li><a href="/#episodes">Episodes</a></li>
+    <li><a href="/search/">Search</a></li>
+    <li><a href="/#about">About</a></li>
+    {{ end }}
+  </ul>
+  <button class="nav-burger" id="navBurger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+{{ block "main" . }}{{ end }}
+
+{{ partial "footer.html" . }}
+
+<script>
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+const burger = document.getElementById('navBurger');
+const drawer = document.getElementById('navDrawer');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  drawer.classList.toggle('open');
+  document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+});
+function closeNav() { burger.classList.remove('open'); drawer.classList.remove('open'); document.body.style.overflow = ''; }
+const observer = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.episode-card, .part-header').forEach(el => observer.observe(el));
+</script>
+{{ block "scripts" . }}{{ end }}
+</body>
+</html>
