@@ -141,7 +141,7 @@
   <div class="series-cards">
     {{ range $key, $s := $allSeries }}
     {{ $pages := where site.RegularPages "Section" $key }}
-    {{ $published := where $pages "Params.published" true }}
+    {{ $published := where $pages "Params.draft" false }}
     <a href="/{{ $key }}/" class="series-card" style="--series-color: {{ $s.color }}">
       <div class="series-card-label">ishistory Series</div>
       <div class="series-card-title">{{ $s.label }}</div>
