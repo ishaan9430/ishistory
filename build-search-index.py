@@ -41,7 +41,7 @@ for series in SERIES_DIRS:
         with open(os.path.join(series_path, fname), 'r', encoding='utf-8') as f:
             text = f.read()
         meta, body = parse_fm(text)
-        if meta.get('coming_soon'): continue  # skip unpublished
+        if meta.get('coming_soon') or meta.get('draft'): continue
         slug = fname.replace('.md', '')
         index.append({
             'slug': slug,
