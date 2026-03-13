@@ -1,6 +1,6 @@
 {{ $seriesKey := .Section }}
 {{ $seriesMeta := index site.Data.series $seriesKey }}
-{{ $published := where .Pages "Params.coming_soon" false }}
+{{ $published := where .Pages "Params.coming_soon" "!=" true }}
 {{ $allPages := .Pages }}
 
 <!DOCTYPE html>
