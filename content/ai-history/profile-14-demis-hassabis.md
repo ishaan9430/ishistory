@@ -8,7 +8,7 @@ part_label: "Profiles: The Builders"
 tag: "Profile"
 description: "The chess prodigy, game designer, and neuroscientist who founded DeepMind and built AlphaGo, AlphaFold, and one of the world's most respected AI labs."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

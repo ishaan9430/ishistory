@@ -8,7 +8,7 @@ part_label: "Profiles: Deep Learning Revolution"
 tag: "Profile"
 description: "The inventor of convolutional neural networks, champion of self-supervised learning, and Meta's Chief AI Scientist with a distinctly contrarian voice."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

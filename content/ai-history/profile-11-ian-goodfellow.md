@@ -8,7 +8,7 @@ part_label: "Profiles: Deep Learning Revolution"
 tag: "Profile"
 description: "The researcher who invented Generative Adversarial Networks in a single evening — and changed the course of generative AI forever."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

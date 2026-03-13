@@ -8,7 +8,7 @@ part_label: "Profiles: Critics & Ethicists"
 tag: "Profile"
 description: "The Berkeley professor and AI textbook author who became one of the loudest voices warning about misaligned AI — and proposing concrete solutions."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*
