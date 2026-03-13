@@ -8,7 +8,7 @@ part_label: "Part 1: The Foundation"
 tag: "Engineering"
 description: "From radio waves to wireless everywhere — how a courtroom settlement and an Australian engineer gave the world wireless internet."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

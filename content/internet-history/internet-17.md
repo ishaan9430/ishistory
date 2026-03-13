@@ -8,7 +8,7 @@ part_label: "Part 3: The Web We Know"
 tag: "Culture"
 description: "Napster, BitTorrent, and the copyright wars that forced every media industry to reinvent itself — or die trying."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

@@ -8,7 +8,7 @@ part_label: "Part 1: The Foundation"
 tag: "Infrastructure"
 description: "The vast physical infrastructure of the internet: thousands of miles of cable on the ocean floor carrying almost all of the world's data."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

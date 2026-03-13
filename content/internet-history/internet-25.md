@@ -8,7 +8,7 @@ part_label: "Part 3: The Web We Know"
 tag: "Infrastructure"
 description: "How Amazon Web Services came to own the internet's backbone — and why a bookseller became the infrastructure company that everything else depends on."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

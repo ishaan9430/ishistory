@@ -8,7 +8,7 @@ part_label: "Part 1: The Foundation"
 tag: "Infrastructure"
 description: "The hidden system that translates human-readable addresses into machine language — and what happens when it breaks."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

@@ -8,7 +8,7 @@ part_label: "Part 1: The Foundation"
 tag: "Engineering"
 description: "The invisible rules that every device on earth follows — and the two engineers who designed them over a single afternoon."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

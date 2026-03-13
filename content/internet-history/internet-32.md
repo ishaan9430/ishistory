@@ -8,7 +8,7 @@ part_label: "Part 4: Power & Politics"
 tag: "Social Media"
 description: "The platform that changed political communication — from Arab Spring to presidential tweets to Elon Musk's takeover, and what it all means."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

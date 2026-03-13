@@ -8,7 +8,7 @@ part_label: "Part 2: Going Public"
 tag: "Web"
 description: "Mosaic, Netscape, and the race to make the web visual — how a group of college students turned a text-based system into something anyone could use."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

@@ -8,7 +8,7 @@ part_label: "Part 3: The Web We Know"
 tag: "Social Media"
 description: "From Friendster to MySpace to Facebook — the strange, competitive early history of the platforms that rewired human social life."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

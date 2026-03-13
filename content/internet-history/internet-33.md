@@ -8,7 +8,7 @@ part_label: "Part 5: What It Became"
 tag: "Business"
 description: "How a handful of companies came to own the internet — and the consequences of letting a public resource become private infrastructure."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

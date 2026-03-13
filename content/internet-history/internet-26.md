@@ -8,7 +8,7 @@ part_label: "Part 4: Power & Politics"
 tag: "Security"
 description: "Security's weakest link from the very beginning — the surprisingly long, consistently troubled history of trying to keep people out of things online."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*

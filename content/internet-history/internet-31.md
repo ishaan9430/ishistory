@@ -8,7 +8,7 @@ part_label: "Part 4: Power & Politics"
 tag: "Policy"
 description: "When the internet exposed the state — the leaks, the fugitives, and the permanent change to how we think about government secrecy."
 date: 2026-03-12
-draft: true
+coming_soon: true
 ---
 
 *Coming soon.*
