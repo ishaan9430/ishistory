@@ -9,7 +9,6 @@ tag: "Profile"
 description: "The 'Godfather of Deep Learning' — decades of perseverance on neural networks, the ImageNet breakthrough, and his dramatic departure from Google."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

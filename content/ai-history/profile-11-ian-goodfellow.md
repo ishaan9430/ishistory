@@ -9,7 +9,6 @@ tag: "Profile"
 description: "The researcher who invented Generative Adversarial Networks in a single evening — and changed the course of generative AI forever."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*

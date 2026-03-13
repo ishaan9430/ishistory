@@ -9,7 +9,6 @@ tag: "Profile"
 description: "The third member of the deep learning trinity — a Turing Award winner who stayed in academia and became one of AI safety's most prominent advocates."
 date: 2026-03-12
 draft: true
-published: false
 ---
 
 *Coming soon.*
