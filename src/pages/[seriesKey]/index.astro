@@ -1,1 +1,314 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cosmos from '../../components/Cosmos.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { series as allSeries } from '../../data/series.js';
 
+export async function getStaticPaths() {
+  return Object.keys(allSeries).map(key => ({ params: { seriesKey: key } }));
+}
+
+const { seriesKey } = Astro.params;
+const seriesMeta = allSeries[seriesKey];
+
+// Load all content files for this series
+const allContent = await Astro.glob('../../content/**/*.md');
+const seriesPages = allContent
+  .filter(p => {
+    const fm = p.frontmatter;
+    return fm.series === seriesKey && !fm.draft;
+  })
+  .sort((a, b) => (a.frontmatter.episode_number ?? 999) - (b.frontmatter.episode_number ?? 999));
+
+const published = seriesPages.filter(p => !p.frontmatter.coming_soon);
+const total = seriesPages.length;
+const pct = total > 0 ? Math.round((published.length / total) * 100) : 0;
+
+// Group by part_label
+const partMap = new Map<string, typeof seriesPages>();
+const partOrder: string[] = [];
+for (const page of seriesPages) {
+  const pl = page.frontmatter.part_label ?? 'Episodes';
+  if (!partMap.has(pl)) { partMap.set(pl, []); partOrder.push(pl); }
+  partMap.get(pl)!.push(page);
+}
+
+// Other series for footer section
+const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
+---
+
+<Base
+  title={`${seriesMeta.label} — ishistory`}
+  description={seriesMeta.description}
+>
+<style define:vars={{ seriesAccent: seriesMeta.color }}>
+:root { --series-accent: var(--seriesAccent); }
+
+.hero {
+  min-height: 72vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: flex-start;
+  padding: 9rem 3rem 5rem;
+  position: relative; z-index: 1;
+}
+.hero::before {
+  content: ''; position: absolute;
+  top: var(--nav-h); left: 3rem; right: 3rem; height: 1px;
+  background: linear-gradient(to right, var(--series-accent), rgba(200,151,58,0.4), transparent 65%);
+  opacity: 0; animation: fadeIn 1s 0.1s ease forwards;
+}
+.hero-glyph {
+  position: absolute; right: 3%; top: 50%; transform: translateY(-48%);
+  font-family: var(--font-serif);
+  font-size: clamp(14rem, 22vw, 26rem);
+  font-weight: 700; font-style: italic; color: transparent;
+  -webkit-text-stroke: 1px rgba(196,98,42,0.065);
+  line-height: 1; pointer-events: none; user-select: none;
+}
+.hero-content { position: relative; max-width: 760px; }
+.hero-breadcrumb {
+  font-family: var(--font-sans); font-size: 0.58rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--dust);
+  margin-bottom: 1.2rem;
+  opacity: 0; transform: translateY(10px); animation: fadeUp 0.7s 0.15s ease forwards;
+}
+.hero-breadcrumb a { color: var(--fog); transition: color 0.2s; }
+.hero-breadcrumb a:hover { color: var(--amber); }
+.hero-breadcrumb span { margin: 0 0.6rem; opacity: 0.35; }
+.hero-eyebrow {
+  font-family: var(--font-sans); font-size: 0.6rem;
+  letter-spacing: 0.32em; text-transform: uppercase; color: var(--ember);
+  margin-bottom: 1.4rem; display: flex; align-items: center; gap: 1.2rem;
+  opacity: 0; transform: translateY(14px); animation: fadeUp 0.8s 0.28s ease forwards;
+}
+.hero-eyebrow::before {
+  content: ''; width: 26px; height: 1px;
+  background: var(--ember); opacity: 0.7; flex-shrink: 0;
+}
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 6.5vw, 6rem);
+  font-weight: 700; line-height: 0.92; letter-spacing: -0.025em;
+  margin-bottom: 1.8rem; color: var(--cream);
+  opacity: 0; transform: translateY(24px); animation: fadeUp 1s 0.4s ease forwards;
+}
+.hero-title em { font-style: italic; font-weight: 400; color: var(--ember); }
+.hero-desc {
+  font-family: var(--font-body); font-size: 1.2rem; line-height: 1.85;
+  color: var(--linen); max-width: 560px; margin-bottom: 2.2rem; font-style: italic;
+  opacity: 0; transform: translateY(18px); animation: fadeUp 0.9s 0.54s ease forwards;
+}
+.hero-stats {
+  display: flex; gap: 2.5rem; flex-wrap: wrap; margin-bottom: 2.2rem;
+  opacity: 0; transform: translateY(14px); animation: fadeUp 0.8s 0.64s ease forwards;
+}
+.stat-num {
+  font-family: var(--font-serif); font-size: 2.1rem;
+  font-style: italic; color: var(--amber); line-height: 1;
+}
+.stat-label {
+  font-family: var(--font-sans); font-size: 0.56rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--dust); margin-top: 0.2rem;
+}
+.hero-cta {
+  display: flex; gap: 1.2rem; flex-wrap: wrap;
+  opacity: 0; transform: translateY(18px); animation: fadeUp 0.9s 0.74s ease forwards;
+}
+
+.progress-wrap {
+  padding: 0 3rem 3rem; position: relative; z-index: 1;
+}
+.progress-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 0.6rem; max-width: 420px;
+}
+.progress-label {
+  font-family: var(--font-sans); font-size: 0.58rem;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--fog);
+}
+.progress-label strong { color: var(--amber); font-weight: 600; }
+.progress-pct {
+  font-family: var(--font-serif); font-size: 1.05rem;
+  font-style: italic; color: rgba(200,151,58,0.3);
+}
+.progress-track {
+  height: 1px; background: rgba(200,151,58,0.1);
+  position: relative; overflow: hidden; max-width: 420px;
+}
+.progress-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: linear-gradient(to right, var(--clay), var(--amber));
+  width: var(--fill-pct);
+}
+
+.episodes-section {
+  padding: 2rem 0 8rem; position: relative; z-index: 1;
+}
+.section-header { padding: 0 3rem; margin-bottom: 2rem; }
+.section-label {
+  font-family: var(--font-sans); font-size: 0.62rem;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ember); margin-bottom: 0.5rem; opacity: 0.8;
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700; font-style: italic; color: var(--cream);
+}
+
+.other-series {
+  padding: 5rem 3rem;
+  border-top: 1px solid rgba(200,151,58,0.08);
+  position: relative; z-index: 1;
+}
+.other-series-label {
+  font-family: var(--font-sans); font-size: 0.62rem;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ember); opacity: 0.8; margin-bottom: 2rem;
+}
+.other-series-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+}
+.other-series-card {
+  padding: 2rem; border: 1px solid rgba(160,144,120,0.09);
+  text-decoration: none; color: inherit; display: block;
+  background: rgba(13,11,16,0.5);
+  transition: background 0.25s, border-color 0.25s;
+}
+.other-series-card:hover { background: rgba(20,15,24,0.8); border-color: rgba(200,151,58,0.18); }
+.other-series-card-label {
+  font-family: var(--font-sans); font-size: 0.57rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ember); margin-bottom: 0.6rem; opacity: 0.68;
+}
+.other-series-card-title {
+  font-family: var(--font-serif); font-size: 1.15rem;
+  font-weight: 700; font-style: italic; color: var(--cream);
+  margin-bottom: 0.45rem; transition: color 0.2s;
+}
+.other-series-card:hover .other-series-card-title { color: var(--ember-hi); }
+.other-series-card-desc {
+  font-family: var(--font-body); font-size: 0.92rem;
+  line-height: 1.65; color: var(--fog);
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 7rem 1.5rem 4rem; }
+  .hero::before { left: 1.5rem; right: 1.5rem; }
+  .hero-glyph { font-size: 46vw; right: -3%; }
+  .progress-wrap, .section-header, .other-series { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+</style>
+
+<Cosmos />
+<Nav backLink={undefined} />
+
+<section class="hero">
+  <div class="hero-glyph" aria-hidden="true">I</div>
+  <div class="hero-content">
+    <p class="hero-breadcrumb">
+      <a href="/">ishistory</a>
+      <span>/</span>
+      {seriesMeta.label}
+    </p>
+    <p class="hero-eyebrow">ishistory — Long-form History</p>
+    <h1 class="hero-title">{seriesMeta.label}</h1>
+    <p class="hero-desc">{seriesMeta.description}</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">{published.length}</div>
+        <div class="stat-label">Published</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">{total}</div>
+        <div class="stat-label">Total episodes</div>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="#episodes" class="btn btn-primary">Start Reading ↓</a>
+      <a href="/search/" class="btn btn-secondary">Search All Episodes</a>
+    </div>
+  </div>
+</section>
+
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <div class="progress-label"><strong>{published.length} of {total}</strong> episodes published</div>
+    <div class="progress-pct">{pct}%</div>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" style={`--fill-pct: ${pct}%`}></div>
+  </div>
+</div>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-sym">✦</div><div class="divider-line"></div></div>
+
+<section class="episodes-section" id="episodes">
+  <div class="section-header">
+    <p class="section-label">Episodes</p>
+    <h2 class="section-title">All Episodes</h2>
+  </div>
+
+  {partOrder.map((pl, pi) => {
+    const eps = partMap.get(pl)!;
+    const subtitle = pl.replace(/Part\s+[IVX\d]+\s*[·:·]?\s*/i, '').trim();
+    const romanMatch = pl.match(/Part\s+([IVX]+)/i);
+    const partRoman = romanMatch ? romanMatch[1] : String(pi + 1);
+
+    return (
+      <div class="part-group">
+        <div class="part-header">
+          <div class="part-numeral">{partRoman}</div>
+          <div>
+            <div class="part-label-mono">Part {pi + 1} of {partOrder.length}</div>
+            <div class="part-subtitle">{subtitle || pl}</div>
+          </div>
+        </div>
+        <div class="episodes-grid">
+          {eps.map(page => {
+            const fm = page.frontmatter;
+            const slug = page.file.split('/').pop()?.replace('.md', '') ?? '';
+            const href = fm.coming_soon ? '#' : `/${seriesKey}/${slug}/`;
+            return (
+              <a href={href} class={`episode-card${fm.coming_soon ? ' coming-soon' : ''}`}>
+                <div class="episode-roman">{fm.roman}</div>
+                <div>
+                  <div class="episode-tag">{fm.tag ?? 'Episode'}</div>
+                  <div class="episode-title">{fm.title}</div>
+                  <div class="episode-desc">{fm.description}</div>
+                </div>
+                <div class="episode-arrow">→</div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    );
+  })}
+</section>
+
+<section class="other-series">
+  <p class="other-series-label">More from ishistory</p>
+  <div class="other-series-grid">
+    {otherSeries.map(([key, s]) => (
+      <a href={`/${key}/`} class="other-series-card">
+        <div class="other-series-card-label">ishistory Series</div>
+        <div class="other-series-card-title">{s.label}</div>
+        <p class="other-series-card-desc">{s.description}</p>
+      </a>
+    ))}
+  </div>
+</section>
+
+<Footer />
+
+<script>
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.episode-card, .part-header').forEach(el => observer.observe(el));
+</script>

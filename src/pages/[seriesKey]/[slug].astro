@@ -1,0 +1,304 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cosmos from '../../components/Cosmos.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { series as allSeries } from '../../data/series.js';
+
+export async function getStaticPaths() {
+  const allContent = await Astro.glob('../../content/**/*.md');
+  return allContent
+    .filter(p => p.frontmatter.series && !p.frontmatter.draft && !p.frontmatter.coming_soon)
+    .map(page => {
+      const slug = page.file.split('/').pop()!.replace('.md', '');
+      const seriesKey = page.frontmatter.series;
+      return { params: { seriesKey, slug }, props: { page } };
+    });
+}
+
+const { seriesKey, slug } = Astro.params;
+const { page } = Astro.props;
+const fm = page.frontmatter;
+const seriesMeta = allSeries[seriesKey];
+const { Content } = page;
+
+// Build prev/next navigation
+const allContent = await Astro.glob('../../content/**/*.md');
+const sorted = allContent
+  .filter(p => p.frontmatter.series === seriesKey && !p.frontmatter.draft && !p.frontmatter.coming_soon)
+  .sort((a, b) => (a.frontmatter.episode_number ?? 999) - (b.frontmatter.episode_number ?? 999));
+
+const currentIdx = sorted.findIndex(p => p.file.split('/').pop()?.replace('.md','') === slug);
+const prevPage = currentIdx > 0 ? sorted[currentIdx - 1] : null;
+const nextPage = currentIdx < sorted.length - 1 ? sorted[currentIdx + 1] : null;
+const prevSlug = prevPage?.file.split('/').pop()?.replace('.md','');
+const nextSlug = nextPage?.file.split('/').pop()?.replace('.md','');
+const prevUrl = prevPage ? `/${seriesKey}/${prevSlug}/` : undefined;
+const nextUrl = nextPage ? `/${seriesKey}/${nextSlug}/` : undefined;
+
+const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+---
+
+<Base
+  title={`${fm.title} — ishistory`}
+  description={fm.description ?? ''}
+  ogType="article"
+  publishedTime={fm.date ? String(fm.date) : undefined}
+  prevUrl={prevUrl}
+  nextUrl={nextUrl}
+>
+
+<style>
+#progressBar {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--amber); width: 0%; z-index: 300;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(200,151,58,0.45);
+}
+
+.ep-hero {
+  padding: 7rem 3rem 4rem;
+  background: linear-gradient(160deg, #0d0b10 0%, #16121a 55%, #080a0d 100%);
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid rgba(200,151,58,0.09);
+  z-index: 1;
+}
+.ep-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 55% 65% at 80% 50%, rgba(200,151,58,0.065) 0%, transparent 60%);
+}
+.ep-hero-bg-numeral {
+  position: absolute; right: 3%; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(10rem, 16vw, 18rem);
+  font-weight: 300; color: rgba(200,151,58,0.05);
+  line-height: 1; pointer-events: none; user-select: none;
+}
+.ep-hero-inner {
+  position: relative; max-width: 760px;
+  opacity: 0; transform: translateY(18px);
+  animation: fadeUp 0.8s 0.1s ease forwards;
+}
+.ep-meta-row {
+  display: flex; align-items: center; gap: 1.2rem;
+  margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.ep-episode-label {
+  font-family: var(--font-mono); font-size: 0.62rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber);
+}
+.ep-sep { color: rgba(200,151,58,0.28); }
+.ep-tag-badge {
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--fog);
+  background: rgba(200,151,58,0.09); padding: 0.25rem 0.7rem;
+}
+.ep-date {
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.1em; color: var(--fog);
+}
+.ep-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  font-weight: 300; line-height: 1.1; letter-spacing: -0.01em;
+  color: var(--parchment); margin-bottom: 1.4rem;
+}
+.ep-description {
+  font-family: var(--font-display); font-size: 1.18rem;
+  font-weight: 300; font-style: italic; line-height: 1.65;
+  color: var(--linen); max-width: 620px; margin-bottom: 1.8rem;
+}
+.ep-part-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  border: 1px solid rgba(200,151,58,0.18); padding: 0.45rem 0.9rem;
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber-lo);
+}
+.ep-hero-actions {
+  display: flex; align-items: center; gap: 1rem;
+  margin-top: 1.8rem; flex-wrap: wrap;
+}
+.ep-share-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid rgba(200,151,58,0.32); background: none;
+  color: var(--fog); cursor: pointer;
+  font-family: var(--font-sans); font-size: 0.62rem;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.ep-share-btn:hover { border-color: var(--amber); color: var(--amber); }
+.ep-share-btn.copied { border-color: #5a9; color: #5a9; }
+
+.ep-reading-bar {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.9rem 3rem;
+  background: rgba(200,151,58,0.03);
+  border-bottom: 1px solid rgba(200,151,58,0.07);
+  position: relative; z-index: 1;
+}
+.ep-reading-text {
+  font-family: var(--font-sans); font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber-lo);
+}
+#readingPct {
+  font-family: var(--font-sans); font-size: 0.6rem;
+  letter-spacing: 0.1em; color: var(--fog); margin-left: auto;
+}
+
+.ep-layout {
+  background: #f5ede0; min-height: 60vh; position: relative; z-index: 1;
+}
+.ep-article {
+  max-width: var(--prose-w); margin: 0 auto;
+  padding: 4rem 3rem; color: #1a1510;
+  font-family: var(--font-body); font-size: 1.15rem; line-height: 1.88;
+}
+.ep-article :global(h1),
+.ep-article :global(h2) {
+  font-family: var(--font-serif); font-weight: 700;
+  color: #0d0b0a; line-height: 1.25;
+}
+.ep-article :global(h1) { font-size: 1.85rem; margin: 2.5rem 0 1rem; }
+.ep-article :global(h2) { font-size: 1.45rem; margin: 2.5rem 0 0.9rem; }
+.ep-article :global(h3) {
+  font-family: var(--font-sans); font-size: 0.72rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--clay); margin: 2rem 0 0.7rem;
+}
+.ep-article :global(p) { margin-bottom: 1.5rem; }
+.ep-article :global(strong) { font-weight: 700; color: #0d0b0a; }
+.ep-article :global(em) { font-style: italic; }
+.ep-article :global(blockquote) {
+  margin: 2.5rem 0; padding: 1.4rem 2rem;
+  border-left: 3px solid var(--amber);
+  background: rgba(200,151,58,0.05);
+  font-style: italic; color: #3a2d20;
+}
+.ep-article :global(blockquote p) { margin: 0; }
+.ep-article :global(hr) {
+  border: none; border-top: 1px solid rgba(200,151,58,0.18);
+  margin: 3rem 0;
+}
+.ep-article :global(a) {
+  color: var(--clay); text-decoration: underline;
+  text-decoration-color: rgba(139,58,26,0.28);
+  transition: color 0.2s;
+}
+.ep-article :global(a:hover) { color: var(--ember); }
+
+.ep-nav {
+  background: #0d0b10; padding: 3rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  border-top: 1px solid rgba(200,151,58,0.09);
+  position: relative; z-index: 1;
+}
+.ep-nav-btn {
+  padding: 2rem;
+  border: 1px solid rgba(160,144,120,0.09);
+  text-decoration: none; color: inherit; display: block;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ep-nav-btn:hover { background: rgba(20,15,24,0.8); border-color: rgba(200,151,58,0.18); }
+.ep-nav-btn.next { text-align: right; }
+.ep-nav-label {
+  font-family: var(--font-sans); font-size: 0.56rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--dust); margin-bottom: 0.5rem;
+}
+.ep-nav-title {
+  font-family: var(--font-serif); font-size: 1rem;
+  font-style: italic; color: var(--linen); line-height: 1.35;
+}
+.ep-empty-nav { padding: 2rem; }
+
+@media (max-width: 768px) {
+  .ep-hero { padding: 6rem 1.5rem 3rem; }
+  .ep-reading-bar { padding: 0.7rem 1.5rem; }
+  .ep-article { padding: 2.5rem 1.5rem; }
+  .ep-nav { grid-template-columns: 1fr; padding: 1.5rem; }
+}
+</style>
+
+<div id="progressBar"></div>
+<Cosmos />
+<Nav backLink={{ href: `/${seriesKey}/`, label: seriesMeta.label }} />
+
+<section class="ep-hero">
+  <div class="ep-hero-bg-numeral">{fm.roman}</div>
+  <div class="ep-hero-inner">
+    <div class="ep-meta-row">
+      {fm.roman && <><span class="ep-episode-label">Episode {fm.roman}</span><span class="ep-sep">·</span></>}
+      {fm.tag && <span class="ep-tag-badge">{fm.tag}</span>}
+      {dateStr && <span class="ep-date">{dateStr}</span>}
+    </div>
+    <h1 class="ep-title">{fm.title}</h1>
+    <p class="ep-description">{fm.description}</p>
+    {fm.part_label && <div class="ep-part-badge">{fm.part_label}</div>}
+    <div class="ep-hero-actions">
+      <button class="ep-share-btn" id="shareBtn">Share Episode</button>
+    </div>
+  </div>
+</section>
+
+<div class="ep-reading-bar">
+  <span class="ep-reading-text">{seriesMeta.label}</span>
+  <span id="readingPct">0%</span>
+</div>
+
+<div class="ep-layout">
+  <article class="ep-article">
+    <Content />
+  </article>
+</div>
+
+<div class="ep-nav">
+  {prevPage ? (
+    <a href={prevUrl} class="ep-nav-btn prev">
+      <div class="ep-nav-label">← Previous</div>
+      <div class="ep-nav-title">{prevPage.frontmatter.title}</div>
+    </a>
+  ) : <div class="ep-empty-nav"></div>}
+
+  {nextPage ? (
+    <a href={nextUrl} class="ep-nav-btn next">
+      <div class="ep-nav-label">Next →</div>
+      <div class="ep-nav-title">{nextPage.frontmatter.title}</div>
+    </a>
+  ) : <div class="ep-empty-nav"></div>}
+</div>
+
+<Footer />
+
+<script define:vars={{ prevUrl, nextUrl }}>
+  // Scroll progress
+  const bar = document.getElementById('progressBar');
+  const pct = document.getElementById('readingPct');
+  const article = document.querySelector('.ep-article');
+  window.addEventListener('scroll', () => {
+    if (!article || !bar || !pct) return;
+    const rect = article.getBoundingClientRect();
+    const total = article.offsetHeight - window.innerHeight;
+    const scrolled = Math.max(0, Math.min(1, -rect.top / total));
+    const p = Math.round(scrolled * 100);
+    bar.style.width = p + '%';
+    pct.textContent = p + '%';
+  }, { passive: true });
+
+  // Share button
+  document.getElementById('shareBtn')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('shareBtn');
+      if (!btn) return;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Share Episode'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' && prevUrl) window.location.href = prevUrl;
+    if (e.key === 'ArrowRight' && nextUrl) window.location.href = nextUrl;
+  });
+</script>
