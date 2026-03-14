@@ -1,1 +1,203 @@
+---
+import Base from '../layouts/Base.astro';
+import Cosmos from '../components/Cosmos.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { series } from '../data/series.js';
+---
 
+<Base
+  title="ishistory — The History Behind the Ideas"
+  description="Three deep-dive series tracing the history of AI, robotics, and the internet. Long-form history for curious people."
+>
+
+<Cosmos />
+<Nav />
+
+<section class="hero">
+  <div class="hero-glyph" aria-hidden="true">∞</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">ishistory — Long-form History</p>
+    <h1 class="hero-title">The history<br/><em>behind the ideas</em></h1>
+    <div class="hero-volume">Three Series · Ongoing</div>
+    <p class="hero-tagline">Science, technology, and the people who shaped the world we inherited.</p>
+    <div class="hero-cta">
+      <a href="#series" class="btn btn-primary">Explore Series ↓</a>
+      <a href="/search/" class="btn btn-secondary">Search All Episodes</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<div class="divider" style="margin: 0;"><div class="divider-line"></div><div class="divider-sym">✦</div><div class="divider-line"></div></div>
+
+<section class="series-intro">
+  <p>Three long-form series exploring the ideas that changed everything — told with the depth they deserve.</p>
+</section>
+
+<section class="series-cards" id="series">
+  {Object.entries(series).map(([key, s]) => (
+    <a href={`/${key}/`} class="series-card" style={`--series-color: ${s.color}`}>
+      <div class="series-card-glyph">{s.glyph}</div>
+      <div class="series-card-body">
+        <div class="series-card-label">ishistory Series</div>
+        <div class="series-card-title">{s.label}</div>
+        <p class="series-card-desc">{s.description}</p>
+      </div>
+      <div class="series-card-arrow">→</div>
+    </a>
+  ))}
+</section>
+
+<Footer />
+
+</Base>
+
+<style>
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: flex-start;
+  padding: 10rem 3rem 6rem;
+  position: relative; z-index: 1; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: var(--nav-h); left: 3rem; right: 3rem; height: 1px;
+  background: linear-gradient(to right, var(--clay), rgba(200,151,58,0.45), transparent 62%);
+  opacity: 0; animation: fadeIn 1s 0.15s ease forwards;
+}
+.hero-glyph {
+  position: absolute; right: 4%; top: 50%; transform: translateY(-48%);
+  font-family: var(--font-serif); font-size: clamp(15rem, 22vw, 26rem);
+  font-weight: 700; font-style: italic; color: transparent;
+  -webkit-text-stroke: 1px rgba(196,98,42,0.07);
+  line-height: 1; pointer-events: none; user-select: none;
+}
+.hero-content { position: relative; max-width: 700px; }
+.hero-eyebrow {
+  font-family: var(--font-sans); font-size: 0.6rem;
+  letter-spacing: 0.32em; text-transform: uppercase; color: var(--ember);
+  margin-bottom: 1.8rem; display: flex; align-items: center; gap: 1.2rem;
+  opacity: 0; transform: translateY(14px); animation: fadeUp 0.8s 0.3s ease forwards;
+}
+.hero-eyebrow::before {
+  content: ''; display: inline-block; width: 26px; height: 1px;
+  background: var(--ember); opacity: 0.7; flex-shrink: 0;
+}
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(3.5rem, 8vw, 7.5rem);
+  font-weight: 700; line-height: 0.92; letter-spacing: -0.025em;
+  margin-bottom: 1.8rem; color: var(--cream);
+  opacity: 0; transform: translateY(24px); animation: fadeUp 1s 0.42s ease forwards;
+}
+.hero-title em { font-style: italic; font-weight: 400; color: var(--ember); }
+.hero-volume {
+  display: inline-block; margin-bottom: 1.2rem;
+  font-family: var(--font-sans); font-size: 0.57rem;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--fog);
+  border: 1px solid rgba(160,144,120,0.2); padding: 0.28rem 0.85rem;
+  opacity: 0; transform: translateY(14px); animation: fadeUp 0.8s 0.55s ease forwards;
+}
+.hero-tagline {
+  font-family: var(--font-body); font-size: 1.2rem;
+  line-height: 1.85; color: var(--linen); max-width: 500px;
+  margin-bottom: 2.8rem; font-style: italic;
+  opacity: 0; transform: translateY(18px); animation: fadeUp 0.9s 0.6s ease forwards;
+}
+.hero-cta {
+  display: flex; gap: 1.2rem; flex-wrap: wrap;
+  opacity: 0; transform: translateY(18px); animation: fadeUp 0.9s 0.72s ease forwards;
+}
+.hero-scroll {
+  position: absolute; bottom: 3rem; left: 3rem;
+  display: flex; align-items: center; gap: 1rem;
+  opacity: 0; animation: fadeUp 1s 1.3s ease forwards;
+}
+.hero-scroll-line {
+  width: 34px; height: 1px; background: var(--clay);
+  transform: scaleX(0); transform-origin: left;
+  animation: expandLine 1.2s 1.5s ease forwards;
+}
+.hero-scroll span {
+  font-family: var(--font-sans); font-size: 0.56rem;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--dust);
+}
+
+.series-intro {
+  padding: 6rem 3rem;
+  max-width: 800px; margin: 0 auto;
+  text-align: center; position: relative; z-index: 1;
+}
+.series-intro p {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-weight: 300; line-height: 1.9;
+  color: var(--linen); font-style: italic;
+}
+
+.series-cards {
+  padding: 0 3rem 8rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px; position: relative; z-index: 1;
+}
+.series-card {
+  padding: 3rem 2.5rem;
+  border: 1px solid rgba(160,144,120,0.09);
+  text-decoration: none; color: inherit; display: flex;
+  flex-direction: column; gap: 1.5rem;
+  background: rgba(13,11,16,0.5);
+  transition: background 0.25s, border-color 0.25s;
+  position: relative; overflow: hidden;
+}
+.series-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--series-color, var(--amber));
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform 0.32s ease;
+}
+.series-card:hover { background: rgba(20,15,24,0.8); border-color: rgba(200,151,58,0.18); }
+.series-card:hover::before { transform: scaleY(1); }
+.series-card-glyph {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  letter-spacing: 0.2em; color: var(--series-color, var(--amber));
+  opacity: 0.6;
+}
+.series-card-body { flex: 1; }
+.series-card-label {
+  font-family: var(--font-sans); font-size: 0.57rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ember); margin-bottom: 0.75rem; opacity: 0.75;
+}
+.series-card-title {
+  font-family: var(--font-serif); font-size: 1.35rem;
+  font-weight: 700; font-style: italic; color: var(--cream);
+  margin-bottom: 0.75rem; line-height: 1.25;
+  transition: color 0.2s;
+}
+.series-card:hover .series-card-title { color: var(--ember-hi); }
+.series-card-desc {
+  font-family: var(--font-body); font-size: 0.95rem;
+  line-height: 1.7; color: var(--fog);
+}
+.series-card-arrow {
+  font-size: 0.9rem; color: rgba(196,98,42,0.22);
+  align-self: flex-end;
+  transition: color 0.2s, transform 0.2s;
+}
+.series-card:hover .series-card-arrow { color: var(--ember); transform: translateX(4px); }
+
+@media (max-width: 768px) {
+  .hero { padding: 8rem 1.5rem 5rem; }
+  .hero::before { left: 1.5rem; right: 1.5rem; }
+  .hero-glyph { font-size: 48vw; right: -3%; }
+  .hero-scroll { left: 1.5rem; }
+  .series-intro { padding: 4rem 1.5rem; }
+  .series-cards { padding: 0 1.5rem 5rem; grid-template-columns: 1fr; }
+}
+</style>

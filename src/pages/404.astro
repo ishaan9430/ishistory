@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import Cosmos from '../components/Cosmos.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base title="404 — ishistory" description="Page not found.">
+<style>
+.not-found {
+  min-height: 80vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: flex-start;
+  padding: 10rem 3rem 6rem; position: relative; z-index: 1;
+}
+.not-found-num {
+  font-family: var(--font-serif);
+  font-size: clamp(8rem, 18vw, 16rem);
+  font-weight: 700; font-style: italic;
+  color: transparent; -webkit-text-stroke: 1px rgba(196,98,42,0.18);
+  line-height: 1; margin-bottom: 1.5rem;
+}
+.not-found-title {
+  font-family: var(--font-serif); font-size: 1.8rem;
+  font-weight: 700; color: var(--cream); margin-bottom: 1rem;
+}
+.not-found-desc {
+  font-family: var(--font-body); font-size: 1.1rem;
+  font-style: italic; color: var(--fog);
+  max-width: 440px; line-height: 1.75; margin-bottom: 2.5rem;
+}
+.not-found-actions { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+@media (max-width: 768px) { .not-found { padding: 8rem 1.5rem 4rem; } }
+</style>
+<Cosmos />
+<Nav />
+<section class="not-found">
+  <div class="not-found-num">404</div>
+  <h1 class="not-found-title">Page not found</h1>
+  <p class="not-found-desc">This page has been lost to history. Perhaps it was never written, or perhaps it has yet to be.</p>
+  <div class="not-found-actions">
+    <a href="/" class="btn btn-primary">Back to Home</a>
+    <a href="/search/" class="btn btn-secondary">Search Episodes</a>
+  </div>
+</section>
+<Footer />
+</Base>

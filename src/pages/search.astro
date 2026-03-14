@@ -1,0 +1,173 @@
+---
+import Base from '../layouts/Base.astro';
+import Cosmos from '../components/Cosmos.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base
+  title="Search — ishistory"
+  description="Search all episodes across every ishistory series."
+>
+
+<style>
+.search-hero {
+  padding: 9rem 3rem 4rem; position: relative; z-index: 1;
+}
+.search-hero::before {
+  content: ''; position: absolute;
+  top: var(--nav-h); left: 3rem; right: 3rem; height: 1px;
+  background: linear-gradient(to right, var(--clay), rgba(200,151,58,0.45), transparent 62%);
+}
+.search-label {
+  font-family: var(--font-sans); font-size: 0.62rem;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ember); margin-bottom: 1rem; opacity: 0.8;
+}
+.search-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 700; font-style: italic;
+  color: var(--cream); margin-bottom: 2.5rem;
+}
+.search-input-wrap { position: relative; max-width: 640px; }
+.search-input {
+  width: 100%;
+  background: rgba(13,11,16,0.85);
+  border: 1px solid rgba(160,144,120,0.18);
+  color: var(--parchment);
+  font-family: var(--font-body); font-size: 1.12rem;
+  padding: 1.05rem 1.4rem; outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: rgba(200,151,58,0.38); }
+.search-input::placeholder { color: var(--dust); font-style: italic; }
+
+.search-results {
+  padding: 2rem 3rem 8rem; position: relative; z-index: 1; max-width: 860px;
+}
+.result-count {
+  font-family: var(--font-sans); font-size: 0.6rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--dust); margin-bottom: 2rem;
+}
+.result-card {
+  display: block; text-decoration: none; color: inherit;
+  padding: 1.8rem 2rem;
+  border: 1px solid rgba(160,144,120,0.08);
+  background: rgba(13,11,16,0.55); margin-bottom: 1px;
+  transition: background 0.2s, border-color 0.2s;
+  position: relative; overflow: hidden;
+}
+.result-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(to bottom, var(--clay), var(--amber));
+  transform: scaleY(0); transform-origin: bottom; transition: transform 0.28s;
+}
+.result-card:hover { background: rgba(20,15,24,0.85); border-color: rgba(200,151,58,0.14); }
+.result-card:hover::before { transform: scaleY(1); }
+.result-series {
+  font-family: var(--font-sans); font-size: 0.55rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ember); margin-bottom: 0.4rem; opacity: 0.78;
+}
+.result-title {
+  font-family: var(--font-serif); font-size: 1.18rem;
+  font-weight: 700; color: var(--cream); margin-bottom: 0.4rem;
+  transition: color 0.2s;
+}
+.result-card:hover .result-title { color: var(--ember-hi); }
+.result-desc {
+  font-family: var(--font-body); font-size: 0.93rem;
+  color: var(--fog); line-height: 1.6;
+}
+.no-results {
+  font-family: var(--font-body); font-size: 1.05rem;
+  font-style: italic; color: var(--fog); padding: 3rem 0;
+}
+
+@media (max-width: 768px) {
+  .search-hero, .search-results { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .search-hero { padding-top: 7rem; }
+}
+</style>
+
+<Cosmos />
+<Nav />
+
+<section class="search-hero">
+  <p class="search-label">Full-text Search</p>
+  <h1 class="search-title">Search All Episodes</h1>
+  <div class="search-input-wrap">
+    <input
+      type="search"
+      class="search-input"
+      id="searchInput"
+      placeholder="Search by title, topic, or keyword…"
+      autofocus
+    />
+  </div>
+</section>
+
+<div class="search-results">
+  <div class="result-count" id="resultCount"></div>
+  <div id="resultsContainer"></div>
+</div>
+
+<Footer />
+
+<script>
+const SERIES_LABELS: Record<string, string> = {
+  'ai-history': 'History of AI',
+  'robotics': 'History of Robotics',
+  'internet-history': 'History of the Internet'
+};
+
+let searchIndex: any[] = [];
+
+fetch('/search-index.json')
+  .then(r => r.json())
+  .then(data => {
+    searchIndex = data;
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) {
+      const input = document.getElementById('searchInput') as HTMLInputElement;
+      input.value = q;
+      doSearch(q);
+    }
+  });
+
+function doSearch(q: string) {
+  const query = q.trim().toLowerCase();
+  const countEl = document.getElementById('resultCount')!;
+  const container = document.getElementById('resultsContainer')!;
+
+  if (!query) { container.innerHTML = ''; countEl.textContent = ''; return; }
+
+  // Multi-word search: all words must match
+  const words = query.split(/\s+/).filter(Boolean);
+  const results = searchIndex.filter(ep => {
+    const haystack = `${ep.title} ${ep.description} ${ep.tag} ${ep.bodyText}`.toLowerCase();
+    return words.every(w => haystack.includes(w));
+  });
+
+  countEl.textContent = `${results.length} result${results.length !== 1 ? 's' : ''} for "${q}"`;
+
+  if (!results.length) {
+    container.innerHTML = '<p class="no-results">No episodes found. Try a different search.</p>';
+    return;
+  }
+
+  container.innerHTML = results.map(ep =>
+    `<a href="/${ep.series}/${ep.slug}/" class="result-card">
+      <div class="result-series">${SERIES_LABELS[ep.series] ?? ep.series}</div>
+      <div class="result-title">${ep.title}</div>
+      <div class="result-desc">${ep.description}</div>
+    </a>`
+  ).join('');
+}
+
+document.getElementById('searchInput')?.addEventListener('input', e => {
+  doSearch((e.target as HTMLInputElement).value);
+});
+</script>
