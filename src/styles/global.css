@@ -129,7 +129,9 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-serif);
   font-size: 1.1rem; font-weight: 700;
   color: var(--cream); letter-spacing: 0.04em;
+  background: rgba(7,6,10,0.85);  /* change from gradient to always slightly visible */
 }
+
 .nav-logo em { color: var(--ember); font-style: italic; font-weight: 400; }
 .nav-links {
   display: flex; gap: 2.5rem; list-style: none; align-items: center;
