@@ -1,0 +1,48 @@
+---
+interface Props {
+  seriesKey?: string;
+  seriesLabel?: string;
+  showBack?: boolean;
+}
+const { seriesKey, seriesLabel, showBack = false } = Astro.props;
+---
+
+<div class="nav-drawer" id="navDrawer">
+  {showBack && seriesKey
+    ? <a href={`/${seriesKey}/`} onclick="closeNav()">← {seriesLabel}</a>
+    : <a href="/" onclick="closeNav()">Home</a>
+  }
+  <a href="/" onclick="closeNav()">All Series</a>
+  <a href="/search/" onclick="closeNav()">Search</a>
+</div>
+
+<nav id="mainNav">
+  <a href="/" class="nav-logo">is<span>history</span></a>
+  <ul class="nav-links">
+    {showBack && seriesKey
+      ? <li><a href={`/${seriesKey}/`} class="nav-back">← {seriesLabel}</a></li>
+      : <li><a href="/">All Series</a></li>
+    }
+    <li><a href="/search/">Search</a></li>
+  </ul>
+  <button class="nav-burger" id="navBurger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<script>
+  const nav = document.getElementById('mainNav')!;
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+  const burger = document.getElementById('navBurger')!;
+  const drawer = document.getElementById('navDrawer')!;
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    drawer.classList.toggle('open');
+    document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+  });
+  (window as any).closeNav = () => {
+    burger.classList.remove('open');
+    drawer.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+</script>
