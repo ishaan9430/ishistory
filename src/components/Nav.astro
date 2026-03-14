@@ -1,45 +1,112 @@
 ---
 interface Props {
-  seriesKey?: string;
-  seriesLabel?: string;
-  showBack?: boolean;
+  backLink?: { href: string; label: string };
 }
-const { seriesKey, seriesLabel, showBack = false } = Astro.props;
+const { backLink } = Astro.props;
 ---
 
 <div class="nav-drawer" id="navDrawer">
-  {showBack && seriesKey
-    ? <a href={`/${seriesKey}/`} onclick="closeNav()">← {seriesLabel}</a>
+  {backLink
+    ? <a href={backLink.href} onclick="closeNav()">← {backLink.label}</a>
     : <a href="/" onclick="closeNav()">Home</a>
   }
   <a href="/" onclick="closeNav()">All Series</a>
   <a href="/search/" onclick="closeNav()">Search</a>
 </div>
 
-<nav id="mainNav">
-  <a href="/" class="nav-logo">is<span>history</span></a>
+<nav class="nav" id="mainNav">
+  <a href="/" class="nav-logo">is<em>history</em></a>
   <ul class="nav-links">
-    {showBack && seriesKey
-      ? <li><a href={`/${seriesKey}/`} class="nav-back">← {seriesLabel}</a></li>
+    {backLink
+      ? <li><a href={backLink.href}>← {backLink.label}</a></li>
       : <li><a href="/">All Series</a></li>
     }
     <li><a href="/search/">Search</a></li>
   </ul>
-  <button class="nav-burger" id="navBurger" aria-label="Menu">
+  <button class="nav-burger" id="navBurger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
+<style>
+.nav-drawer {
+  display: none;
+  position: fixed; inset: 0; z-index: 199;
+  background: rgba(7,6,10,0.98);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2.5rem;
+}
+.nav-drawer.open { display: flex; }
+.nav-drawer a {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 2rem; font-style: italic;
+  color: #f0e8d8; text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-drawer a:hover { color: #c4622a; }
+
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 64px;
+  background: rgba(7,6,10,0.95);
+  border-bottom: 1px solid rgba(200,151,58,0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-logo {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: #f0e8d8; text-decoration: none;
+  letter-spacing: 0.04em; flex-shrink: 0;
+}
+.nav-logo em { color: #c4622a; font-style: italic; font-weight: 400; }
+
+.nav-links {
+  display: flex; gap: 2.5rem;
+  list-style: none; align-items: center;
+}
+.nav-links a {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.62rem; letter-spacing: 0.24em;
+  text-transform: uppercase; color: #9a8f7e;
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: #c8973a; }
+
+.nav-burger {
+  display: none;
+  flex-direction: column; gap: 5px;
+  background: none; border: none;
+  cursor: pointer; padding: 6px;
+}
+.nav-burger span {
+  display: block; width: 22px; height: 1.5px;
+  background: #9a8f7e; transition: all 0.25s;
+}
+.nav-burger.open span:nth-child(1) { transform: rotate(45deg) translate(4px,4px); }
+.nav-burger.open span:nth-child(2) { opacity: 0; }
+.nav-burger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px,-4px); }
+
+@media (max-width: 768px) {
+  .nav { padding: 0 1.25rem; }
+  .nav-links { display: none; }
+  .nav-burger { display: flex; }
+}
+</style>
+
 <script>
-  const nav = document.getElementById('mainNav')!;
-  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
   const burger = document.getElementById('navBurger')!;
   const drawer = document.getElementById('navDrawer')!;
+
   burger.addEventListener('click', () => {
     burger.classList.toggle('open');
     drawer.classList.toggle('open');
     document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
   });
+
   (window as any).closeNav = () => {
     burger.classList.remove('open');
     drawer.classList.remove('open');
