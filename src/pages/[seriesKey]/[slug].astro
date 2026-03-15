@@ -22,7 +22,7 @@ const fm = page.frontmatter;
 const seriesMeta = allSeries[seriesKey];
 const { Content } = page;
 
-// Build prev/next navigation
+// Prev/next
 const allContent = await Astro.glob('../../content/**/*.md');
 const sorted = allContent
   .filter(p => p.frontmatter.series === seriesKey && !p.frontmatter.draft && !p.frontmatter.coming_soon)
@@ -35,6 +35,19 @@ const prevSlug = prevPage?.file.split('/').pop()?.replace('.md','');
 const nextSlug = nextPage?.file.split('/').pop()?.replace('.md','');
 const prevUrl = prevPage ? `/${seriesKey}/${prevSlug}/` : undefined;
 const nextUrl = nextPage ? `/${seriesKey}/${nextSlug}/` : undefined;
+
+// Related episodes — same part_label, exclude current
+const related = sorted
+  .filter(p => {
+    const s = p.file.split('/').pop()?.replace('.md','');
+    return s !== slug && p.frontmatter.part_label === fm.part_label;
+  })
+  .slice(0, 3);
+
+// Reading time — estimate from raw content
+const rawBody = typeof page.rawContent === 'function' ? page.rawContent() : '';
+const wordCount = rawBody.trim().split(/\s+/).length;
+const readingTime = Math.max(1, Math.round(wordCount / 200));
 
 const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
 ---
@@ -51,11 +64,12 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 <style>
 #progressBar {
   position: fixed; top: 0; left: 0; height: 2px;
-  background: var(--amber); width: 0%; z-index: 300;
+  background: #c8973a; width: 0%; z-index: 300;
   transition: width 0.1s linear;
   box-shadow: 0 0 8px rgba(200,151,58,0.45);
 }
 
+/* ── HERO ── */
 .ep-hero {
   padding: 7rem 3rem 4rem;
   background: linear-gradient(160deg, #0d0b10 0%, #16121a 55%, #080a0d 100%);
@@ -69,7 +83,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 }
 .ep-hero-bg-numeral {
   position: absolute; right: 3%; top: 50%; transform: translateY(-50%);
-  font-family: var(--font-display);
+  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(10rem, 16vw, 18rem);
   font-weight: 300; color: rgba(200,151,58,0.05);
   line-height: 1; pointer-events: none; user-select: none;
@@ -84,35 +98,46 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   margin-bottom: 1.5rem; flex-wrap: wrap;
 }
 .ep-episode-label {
-  font-family: var(--font-mono); font-size: 0.62rem;
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber);
+  font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #c8973a;
 }
 .ep-sep { color: rgba(200,151,58,0.28); }
 .ep-tag-badge {
-  font-family: var(--font-mono); font-size: 0.6rem;
-  letter-spacing: 0.15em; text-transform: uppercase; color: var(--fog);
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #9a8f7e;
   background: rgba(200,151,58,0.09); padding: 0.25rem 0.7rem;
 }
 .ep-date {
-  font-family: var(--font-mono); font-size: 0.6rem;
-  letter-spacing: 0.1em; color: var(--fog);
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.1em; color: #9a8f7e;
+}
+.ep-read-time {
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.1em; color: #564b3c;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.ep-read-time::before {
+  content: ''; display: inline-block;
+  width: 12px; height: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23564b3c' stroke-width='2' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E");
+  background-size: contain; background-repeat: no-repeat;
 }
 .ep-title {
-  font-family: var(--font-display);
+  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2.2rem, 4.5vw, 3.8rem);
   font-weight: 300; line-height: 1.1; letter-spacing: -0.01em;
-  color: var(--parchment); margin-bottom: 1.4rem;
+  color: #e4d9c4; margin-bottom: 1.4rem;
 }
 .ep-description {
-  font-family: var(--font-display); font-size: 1.18rem;
+  font-family: 'Cormorant Garamond', serif; font-size: 1.18rem;
   font-weight: 300; font-style: italic; line-height: 1.65;
-  color: var(--linen); max-width: 620px; margin-bottom: 1.8rem;
+  color: #cfc3ab; max-width: 620px; margin-bottom: 1.8rem;
 }
 .ep-part-badge {
   display: inline-flex; align-items: center; gap: 0.5rem;
   border: 1px solid rgba(200,151,58,0.18); padding: 0.45rem 0.9rem;
-  font-family: var(--font-mono); font-size: 0.6rem;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber-lo);
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #7a5820;
 }
 .ep-hero-actions {
   display: flex; align-items: center; gap: 1rem;
@@ -122,14 +147,15 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 0.7rem 1.4rem;
   border: 1px solid rgba(200,151,58,0.32); background: none;
-  color: var(--fog); cursor: pointer;
-  font-family: var(--font-sans); font-size: 0.62rem;
+  color: #9a8f7e; cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
   letter-spacing: 0.13em; text-transform: uppercase;
   transition: all 0.2s;
 }
-.ep-share-btn:hover { border-color: var(--amber); color: var(--amber); }
+.ep-share-btn:hover { border-color: #c8973a; color: #c8973a; }
 .ep-share-btn.copied { border-color: #5a9; color: #5a9; }
 
+/* ── READING BAR ── */
 .ep-reading-bar {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.9rem 3rem;
@@ -138,40 +164,89 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   position: relative; z-index: 1;
 }
 .ep-reading-text {
-  font-family: var(--font-sans); font-size: 0.6rem;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber-lo);
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #7a5820;
 }
 #readingPct {
-  font-family: var(--font-sans); font-size: 0.6rem;
-  letter-spacing: 0.1em; color: var(--fog); margin-left: auto;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.6rem;
+  letter-spacing: 0.1em; color: #9a8f7e; margin-left: auto;
 }
 
+/* ── TOC ── */
+.ep-toc-wrap {
+  background: rgba(200,151,58,0.04);
+  border: 1px solid rgba(200,151,58,0.12);
+  border-radius: 6px;
+  margin: 0 3rem 0; padding: 0;
+  position: relative; z-index: 1;
+  overflow: hidden;
+}
+.ep-toc-toggle {
+  width: 100%; display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem; background: none; border: none;
+  cursor: pointer; text-align: left;
+}
+.ep-toc-label {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
+  letter-spacing: 0.22em; text-transform: uppercase; color: #c8973a;
+}
+.ep-toc-arrow {
+  font-size: 0.7rem; color: #564b3c;
+  transition: transform 0.25s;
+}
+.ep-toc-wrap.open .ep-toc-arrow { transform: rotate(180deg); }
+.ep-toc-list {
+  display: none; list-style: none;
+  padding: 0 1.5rem 1.2rem; margin: 0;
+  border-top: 1px solid rgba(200,151,58,0.08);
+}
+.ep-toc-wrap.open .ep-toc-list { display: block; }
+.ep-toc-list li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(200,151,58,0.05);
+}
+.ep-toc-list li:last-child { border-bottom: none; }
+.ep-toc-list a {
+  font-family: 'Crimson Pro', serif; font-size: 1rem;
+  color: #9a8f7e; text-decoration: none;
+  transition: color 0.2s; display: block;
+  padding: 0.1rem 0;
+}
+.ep-toc-list a:hover { color: #c8973a; }
+.ep-toc-list .toc-h3 {
+  padding-left: 1rem;
+  font-size: 0.92rem;
+}
+
+/* ── ARTICLE ── */
 .ep-layout {
   background: #f5ede0; min-height: 60vh; position: relative; z-index: 1;
 }
 .ep-article {
-  max-width: var(--prose-w); margin: 0 auto;
+  max-width: 740px; margin: 0 auto;
   padding: 4rem 3rem; color: #1a1510;
-  font-family: var(--font-body); font-size: 1.15rem; line-height: 1.88;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.18rem; line-height: 1.92;
 }
 .ep-article :global(h1),
 .ep-article :global(h2) {
-  font-family: var(--font-serif); font-weight: 700;
+  font-family: 'Libre Baskerville', serif; font-weight: 700;
   color: #0d0b0a; line-height: 1.25;
 }
 .ep-article :global(h1) { font-size: 1.85rem; margin: 2.5rem 0 1rem; }
 .ep-article :global(h2) { font-size: 1.45rem; margin: 2.5rem 0 0.9rem; }
 .ep-article :global(h3) {
-  font-family: var(--font-sans); font-size: 0.72rem;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--clay); margin: 2rem 0 0.7rem;
+  color: #8b3a1a; margin: 2rem 0 0.7rem;
 }
 .ep-article :global(p) { margin-bottom: 1.5rem; }
 .ep-article :global(strong) { font-weight: 700; color: #0d0b0a; }
 .ep-article :global(em) { font-style: italic; }
 .ep-article :global(blockquote) {
   margin: 2.5rem 0; padding: 1.4rem 2rem;
-  border-left: 3px solid var(--amber);
+  border-left: 3px solid #c8973a;
   background: rgba(200,151,58,0.05);
   font-style: italic; color: #3a2d20;
 }
@@ -181,12 +256,63 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   margin: 3rem 0;
 }
 .ep-article :global(a) {
-  color: var(--clay); text-decoration: underline;
+  color: #8b3a1a; text-decoration: underline;
   text-decoration-color: rgba(139,58,26,0.28);
   transition: color 0.2s;
 }
-.ep-article :global(a:hover) { color: var(--ember); }
+.ep-article :global(a:hover) { color: #c4622a; }
 
+/* ── RELATED ── */
+.ep-related {
+  background: #0d0b10; padding: 3rem;
+  border-top: 1px solid rgba(200,151,58,0.09);
+  position: relative; z-index: 1;
+}
+.ep-related-label {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: #c4622a; opacity: 0.8; margin-bottom: 1.5rem;
+}
+.ep-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.ep-related-card {
+  display: block; text-decoration: none; color: inherit;
+  background: rgba(20,18,24,0.8);
+  border: 1px solid rgba(160,144,120,0.1);
+  border-radius: 8px; padding: 1.4rem;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.ep-related-card:hover {
+  background: rgba(28,24,32,0.95);
+  border-color: rgba(200,151,58,0.22);
+  transform: translateY(-2px);
+}
+.ep-related-roman {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.6rem; font-style: italic;
+  color: rgba(196,98,42,0.2); line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.ep-related-tag {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.52rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: #c4622a; opacity: 0.75; margin-bottom: 0.4rem;
+}
+.ep-related-title {
+  font-family: 'Libre Baskerville', serif; font-size: 0.95rem;
+  font-weight: 700; color: #f0e8d8; line-height: 1.35;
+  margin-bottom: 0.4rem; transition: color 0.2s;
+}
+.ep-related-card:hover .ep-related-title { color: #d97a42; }
+.ep-related-read-time {
+  font-family: 'DM Mono', monospace; font-size: 0.55rem;
+  color: #564b3c; letter-spacing: 0.1em;
+}
+
+/* ── PREV/NEXT NAV ── */
 .ep-nav {
   background: #0d0b10; padding: 3rem;
   display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
@@ -194,29 +320,48 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   position: relative; z-index: 1;
 }
 .ep-nav-btn {
-  padding: 2rem;
-  border: 1px solid rgba(160,144,120,0.09);
+  padding: 2rem; border: 1px solid rgba(160,144,120,0.09);
   text-decoration: none; color: inherit; display: block;
   transition: background 0.2s, border-color 0.2s;
+  border-radius: 4px;
 }
 .ep-nav-btn:hover { background: rgba(20,15,24,0.8); border-color: rgba(200,151,58,0.18); }
 .ep-nav-btn.next { text-align: right; }
 .ep-nav-label {
-  font-family: var(--font-sans); font-size: 0.56rem;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.56rem;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--dust); margin-bottom: 0.5rem;
+  color: #564b3c; margin-bottom: 0.5rem;
 }
 .ep-nav-title {
-  font-family: var(--font-serif); font-size: 1rem;
-  font-style: italic; color: var(--linen); line-height: 1.35;
+  font-family: 'Libre Baskerville', serif; font-size: 1rem;
+  font-style: italic; color: #cfc3ab; line-height: 1.35;
 }
 .ep-empty-nav { padding: 2rem; }
+
+/* ── BACK TO TOP ── */
+#backToTop {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+  width: 42px; height: 42px;
+  background: rgba(20,18,24,0.92);
+  border: 1px solid rgba(200,151,58,0.25);
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #9a8f7e; font-size: 1rem;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s, border-color 0.2s;
+  pointer-events: none;
+}
+#backToTop.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+#backToTop:hover { border-color: #c8973a; color: #c8973a; }
 
 @media (max-width: 768px) {
   .ep-hero { padding: 6rem 1.5rem 3rem; }
   .ep-reading-bar { padding: 0.7rem 1.5rem; }
-  .ep-article { padding: 2.5rem 1.5rem; }
+  .ep-toc-wrap { margin: 0 1.5rem; }
+  .ep-article { padding: 2.5rem 1.5rem; font-size: 1.12rem; line-height: 1.85; }
+  .ep-related { padding: 2rem 1.5rem; }
   .ep-nav { grid-template-columns: 1fr; padding: 1.5rem; }
+  #backToTop { bottom: 1.5rem; right: 1.5rem; }
 }
 </style>
 
@@ -231,6 +376,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
       {fm.roman && <><span class="ep-episode-label">Episode {fm.roman}</span><span class="ep-sep">·</span></>}
       {fm.tag && <span class="ep-tag-badge">{fm.tag}</span>}
       {dateStr && <span class="ep-date">{dateStr}</span>}
+      <span class="ep-read-time">{readingTime} min read</span>
     </div>
     <h1 class="ep-title">{fm.title}</h1>
     <p class="ep-description">{fm.description}</p>
@@ -246,11 +392,42 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   <span id="readingPct">0%</span>
 </div>
 
+<!-- Table of contents (built from headings by JS) -->
+<div class="ep-toc-wrap" id="tocWrap" style="display:none">
+  <button class="ep-toc-toggle" id="tocToggle">
+    <span class="ep-toc-label">Table of Contents</span>
+    <span class="ep-toc-arrow">▾</span>
+  </button>
+  <ul class="ep-toc-list" id="tocList"></ul>
+</div>
+
 <div class="ep-layout">
-  <article class="ep-article">
+  <article class="ep-article" id="epArticle">
     <Content />
   </article>
 </div>
+
+<!-- Related episodes -->
+{related.length > 0 && (
+  <div class="ep-related">
+    <p class="ep-related-label">Also in this part</p>
+    <div class="ep-related-grid">
+      {related.map(r => {
+        const rSlug = r.file.split('/').pop()?.replace('.md','');
+        const rWords = typeof r.rawContent === 'function' ? r.rawContent().trim().split(/\s+/).length : 0;
+        const rTime = Math.max(1, Math.round(rWords / 200));
+        return (
+          <a href={`/${seriesKey}/${rSlug}/`} class="ep-related-card">
+            <div class="ep-related-roman">{r.frontmatter.roman}</div>
+            <div class="ep-related-tag">{r.frontmatter.tag ?? 'Episode'}</div>
+            <div class="ep-related-title">{r.frontmatter.title}</div>
+            <div class="ep-related-read-time">{rTime} min read</div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+)}
 
 <div class="ep-nav">
   {prevPage ? (
@@ -259,7 +436,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
       <div class="ep-nav-title">{prevPage.frontmatter.title}</div>
     </a>
   ) : <div class="ep-empty-nav"></div>}
-
   {nextPage ? (
     <a href={nextUrl} class="ep-nav-btn next">
       <div class="ep-nav-label">Next →</div>
@@ -270,11 +446,16 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 
 <Footer />
 
-<script define:vars={{ prevUrl, nextUrl }}>
-  // Scroll progress
+<!-- Back to top -->
+<button id="backToTop" aria-label="Back to top">↑</button>
+
+<script define:vars={{ prevUrl, nextUrl, slug, seriesKey }}>
+  // ── PROGRESS BAR ──
   const bar = document.getElementById('progressBar');
   const pct = document.getElementById('readingPct');
-  const article = document.querySelector('.ep-article');
+  const article = document.getElementById('epArticle');
+  const backToTop = document.getElementById('backToTop');
+
   window.addEventListener('scroll', () => {
     if (!article || !bar || !pct) return;
     const rect = article.getBoundingClientRect();
@@ -283,9 +464,48 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     const p = Math.round(scrolled * 100);
     bar.style.width = p + '%';
     pct.textContent = p + '%';
+    if (backToTop) backToTop.classList.toggle('visible', window.scrollY > 600);
   }, { passive: true });
 
-  // Share button
+  // ── BACK TO TOP ──
+  backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── MARK AS READ (localStorage) ──
+  const readKey = `read:${seriesKey}:${slug}`;
+  localStorage.setItem(readKey, '1');
+
+  // ── TABLE OF CONTENTS ──
+  const headings = article?.querySelectorAll('h2, h3');
+  const tocWrap = document.getElementById('tocWrap');
+  const tocList = document.getElementById('tocList');
+  const tocToggle = document.getElementById('tocToggle');
+
+  if (headings && headings.length >= 3 && tocWrap && tocList) {
+    tocWrap.style.display = 'block';
+    headings.forEach((h, i) => {
+      if (!h.id) h.id = `heading-${i}`;
+      const li = document.createElement('li');
+      if (h.tagName === 'H3') li.classList.add('toc-h3');
+      const a = document.createElement('a');
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent ?? '';
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        tocWrap.classList.remove('open');
+        tocList.style.display = 'none';
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+
+    tocToggle?.addEventListener('click', () => {
+      const isOpen = tocWrap.classList.toggle('open');
+      tocList.style.display = isOpen ? 'block' : 'none';
+    });
+  }
+
+  // ── SHARE ──
   document.getElementById('shareBtn')?.addEventListener('click', () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('shareBtn');
@@ -296,9 +516,11 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     });
   });
 
-  // Keyboard navigation
+  // ── KEYBOARD NAV ──
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft' && prevUrl) window.location.href = prevUrl;
     if (e.key === 'ArrowRight' && nextUrl) window.location.href = nextUrl;
   });
 </script>
+
+</Base>
