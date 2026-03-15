@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Block search index JSON from being indexed (it's internal data)
+Disallow: /search-index.json
+
+# Sitemap location
+Sitemap: https://ishistory.pages.dev/sitemap.xml
