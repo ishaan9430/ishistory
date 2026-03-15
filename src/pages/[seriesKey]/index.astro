@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Cosmos from '../../components/Cosmos.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
+import Newsletter from '../../components/Newsletter.astro';
 import { series as allSeries } from '../../data/series.js';
 
 export async function getStaticPaths() {
@@ -39,7 +40,7 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
 ---
 
 <Base
-  title={`${seriesMeta.label} — ishistory`}
+  title={`${seriesMeta.label} â€” ishistory`}
   description={seriesMeta.description}
 >
 <style define:vars={{ seriesAccent: seriesMeta.color }}>
@@ -214,7 +215,7 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
       <span>/</span>
       {seriesMeta.label}
     </p>
-    <p class="hero-eyebrow">ishistory — Long-form History</p>
+    <p class="hero-eyebrow">ishistory â€” Long-form History</p>
     <h1 class="hero-title">{seriesMeta.label}</h1>
     <p class="hero-desc">{seriesMeta.description}</p>
     <div class="hero-stats">
@@ -228,7 +229,7 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
       </div>
     </div>
     <div class="hero-cta">
-      <a href="#episodes" class="btn btn-primary">Start Reading ↓</a>
+      <a href="#episodes" class="btn btn-primary">Start Reading â†“</a>
       <a href="/search/" class="btn btn-secondary">Search All Episodes</a>
     </div>
   </div>
@@ -244,7 +245,7 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
   </div>
 </div>
 
-<div class="divider"><div class="divider-line"></div><div class="divider-sym">✦</div><div class="divider-line"></div></div>
+<div class="divider"><div class="divider-line"></div><div class="divider-sym">âœ¦</div><div class="divider-line"></div></div>
 
 <section class="episodes-section" id="episodes">
   <div class="section-header">
@@ -254,7 +255,7 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
 
   {partOrder.map((pl, pi) => {
     const eps = partMap.get(pl)!;
-    const subtitle = pl.replace(/Part\s+[IVX\d]+\s*[·:·]?\s*/i, '').trim();
+    const subtitle = pl.replace(/Part\s+[IVX\d]+\s*[Â·:Â·]?\s*/i, '').trim();
     const romanMatch = pl.match(/Part\s+([IVX]+)/i);
     const partRoman = romanMatch ? romanMatch[1] : String(pi + 1);
 
@@ -282,14 +283,14 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
                   <div class="episode-tag">{fm.tag ?? 'Episode'}</div>
                   <div class="episode-title">
                     {fm.title}
-                    <span class="episode-read-check" aria-label="Read">✓</span>
+                    <span class="episode-read-check" aria-label="Read">âœ“</span>
                   </div>
                   <div class="episode-desc">{fm.description}</div>
                   {!fm.coming_soon && (
                     <div class="episode-read-time">{readTime} min read</div>
                   )}
                 </div>
-                <div class="episode-arrow">→</div>
+                <div class="episode-arrow">â†’</div>
               </a>
             );
           })}
@@ -311,6 +312,8 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
     ))}
   </div>
 </section>
+
+<Newsletter source={`series:${seriesKey}`} />
 
 <Footer />
 
