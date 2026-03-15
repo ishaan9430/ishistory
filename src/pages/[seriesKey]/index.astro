@@ -272,9 +272,63 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
             const fm = page.frontmatter;
             const slug = page.file.split('/').pop()?.replace('.md', '') ?? '';
             const href = fm.coming_soon ? '#' : `/${seriesKey}/${slug}/`;
+            const rawBody = typeof page.rawContent === 'function' ? page.rawContent() : '';
+            const wordCount = rawBody.trim().split(/\s+/).length;
+            const readTime = Math.max(1, Math.round(wordCount / 200));
             return (
-              <a href={href} class={`episode-card${fm.coming_soon ? ' coming-soon' : ''}`}>
+              <a href={href} class={`episode-card${fm.coming_soon ? ' coming-soon' : ''}`} data-read-key={`read:${seriesKey}:${slug}`}>
                 <div class="episode-roman">{fm.roman}</div>
+                <div>
+                  <div class="episode-tag">{fm.tag ?? 'Episode'}</div>
+                  <div class="episode-title">
+                    {fm.title}
+                    <span class="episode-read-check" aria-label="Read">✓</span>
+                  </div>
+                  <div class="episode-desc">{fm.description}</div>
+                  {!fm.coming_soon && (
+                    <div class="episode-read-time">{readTime} min read</div>
+                  )}
+                </div>
+                <div class="episode-arrow">→</div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    );
+  })}
+</section>
+
+<section class="other-series">
+  <p class="other-series-label">More from ishistory</p>
+  <div class="other-series-grid">
+    {otherSeries.map(([key, s]) => (
+      <a href={`/${key}/`} class="other-series-card">
+        <div class="other-series-card-label">ishistory Series</div>
+        <div class="other-series-card-title">{s.label}</div>
+        <p class="other-series-card-desc">{s.description}</p>
+      </a>
+    ))}
+  </div>
+</section>
+
+<Footer />
+
+<script>
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.episode-card, .part-header').forEach(el => observer.observe(el));
+
+  // Mark read episodes with checkmark from localStorage
+  document.querySelectorAll('.episode-card[data-read-key]').forEach(card => {
+    const key = card.getAttribute('data-read-key');
+    if (key && localStorage.getItem(key)) {
+      card.classList.add('is-read');
+    }
+  });
+</script>            <div class="episode-roman">{fm.roman}</div>
                 <div>
                   <div class="episode-tag">{fm.tag ?? 'Episode'}</div>
                   <div class="episode-title">{fm.title}</div>
