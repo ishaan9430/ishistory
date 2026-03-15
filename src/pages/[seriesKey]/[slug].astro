@@ -14,7 +14,7 @@ export async function getStaticPaths() {
   return allContent
     .filter(p => p.frontmatter.series && !p.frontmatter.draft && !p.frontmatter.coming_soon)
     .map(page => {
-      const slug = page.file.split('/').pop()!.replace('.md', '');
+      const slug = page.file.split('/').pop().replace('.md', '');
       const seriesKey = page.frontmatter.series;
       return { params: { seriesKey, slug }, props: { page } };
     });
@@ -26,7 +26,6 @@ const fm = page.frontmatter;
 const seriesMeta = allSeries[seriesKey];
 const { Content } = page;
 
-// Prev/next
 const allContent = await Astro.glob('../../content/**/*.md');
 const sorted = allContent
   .filter(p => p.frontmatter.series === seriesKey && !p.frontmatter.draft && !p.frontmatter.coming_soon)
@@ -40,7 +39,6 @@ const nextSlug = nextPage?.file.split('/').pop()?.replace('.md','');
 const prevUrl = prevPage ? `/${seriesKey}/${prevSlug}/` : undefined;
 const nextUrl = nextPage ? `/${seriesKey}/${nextSlug}/` : undefined;
 
-// Related episodes — same part_label, exclude current
 const related = sorted
   .filter(p => {
     const s = p.file.split('/').pop()?.replace('.md','');
@@ -48,7 +46,6 @@ const related = sorted
   })
   .slice(0, 3);
 
-// Reading time — estimate from raw content
 const rawBody = typeof page.rawContent === 'function' ? page.rawContent() : '';
 const wordCount = rawBody.trim().split(/\s+/).length;
 const readingTime = Math.max(1, Math.round(wordCount / 200));
@@ -57,7 +54,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 ---
 
 <Base
-  title={`${fm.title} — ishistory`}
+  title={`${fm.title} - ishistory`}
   description={fm.description ?? ''}
   ogType="article"
   publishedTime={fm.date ? String(fm.date) : undefined}
@@ -73,7 +70,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   box-shadow: 0 0 8px rgba(200,151,58,0.45);
 }
 
-/* —— HERO —— */
 .ep-hero {
   padding: 7rem 3rem 4rem;
   background: linear-gradient(160deg, #0d0b10 0%, #16121a 55%, #080a0d 100%);
@@ -120,12 +116,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   letter-spacing: 0.1em; color: #564b3c;
   display: flex; align-items: center; gap: 0.4rem;
 }
-.ep-read-time::before {
-  content: ''; display: inline-block;
-  width: 12px; height: 12px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23564b3c' stroke-width='2' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E");
-  background-size: contain; background-repeat: no-repeat;
-}
 .ep-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2.2rem, 4.5vw, 3.8rem);
@@ -159,7 +149,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 .ep-share-btn:hover { border-color: #c8973a; color: #c8973a; }
 .ep-share-btn.copied { border-color: #5a9; color: #5a9; }
 
-/* —— READING BAR —— */
 .ep-reading-bar {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.9rem 3rem;
@@ -176,12 +165,11 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   letter-spacing: 0.1em; color: #9a8f7e; margin-left: auto;
 }
 
-/* —— TOC —— */
 .ep-toc-wrap {
   background: rgba(200,151,58,0.04);
   border: 1px solid rgba(200,151,58,0.12);
   border-radius: 6px;
-  margin: 0 3rem 0; padding: 0;
+  margin: 0 3rem; padding: 0;
   position: relative; z-index: 1;
   overflow: hidden;
 }
@@ -214,16 +202,11 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 .ep-toc-list a {
   font-family: 'Crimson Pro', serif; font-size: 1rem;
   color: #9a8f7e; text-decoration: none;
-  transition: color 0.2s; display: block;
-  padding: 0.1rem 0;
+  transition: color 0.2s; display: block; padding: 0.1rem 0;
 }
 .ep-toc-list a:hover { color: #c8973a; }
-.ep-toc-list .toc-h3 {
-  padding-left: 1rem;
-  font-size: 0.92rem;
-}
+.ep-toc-list .toc-h3 { padding-left: 1rem; font-size: 0.92rem; }
 
-/* —— ARTICLE —— */
 .ep-layout {
   background: #f5ede0; min-height: 60vh; position: relative; z-index: 1;
 }
@@ -266,7 +249,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 }
 .ep-article :global(a:hover) { color: #c4622a; }
 
-/* —— RELATED —— */
 .ep-related {
   background: #0d0b10; padding: 3rem;
   border-top: 1px solid rgba(200,151,58,0.09);
@@ -297,8 +279,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 .ep-related-roman {
   font-family: 'Libre Baskerville', serif;
   font-size: 1.6rem; font-style: italic;
-  color: rgba(196,98,42,0.2); line-height: 1;
-  margin-bottom: 0.5rem;
+  color: rgba(196,98,42,0.2); line-height: 1; margin-bottom: 0.5rem;
 }
 .ep-related-tag {
   font-family: 'Josefin Sans', sans-serif; font-size: 0.52rem;
@@ -316,7 +297,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   color: #564b3c; letter-spacing: 0.1em;
 }
 
-/* —— PREV/NEXT NAV —— */
 .ep-nav {
   background: #0d0b10; padding: 3rem;
   display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
@@ -326,8 +306,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 .ep-nav-btn {
   padding: 2rem; border: 1px solid rgba(160,144,120,0.09);
   text-decoration: none; color: inherit; display: block;
-  transition: background 0.2s, border-color 0.2s;
-  border-radius: 4px;
+  transition: background 0.2s, border-color 0.2s; border-radius: 4px;
 }
 .ep-nav-btn:hover { background: rgba(20,15,24,0.8); border-color: rgba(200,151,58,0.18); }
 .ep-nav-btn.next { text-align: right; }
@@ -342,7 +321,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 }
 .ep-empty-nav { padding: 2rem; }
 
-/* —— BACK TO TOP —— */
 #backToTop {
   position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
   width: 42px; height: 42px;
@@ -364,6 +342,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   border-bottom: 1px solid rgba(200,151,58,0.09);
   position: relative; z-index: 1;
 }
+
 @media (max-width: 768px) {
   .ep-audio-wrap { padding: 1.2rem 1.5rem; }
   .ep-hero { padding: 6rem 1.5rem 3rem; }
@@ -403,18 +382,16 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   <span id="readingPct">0%</span>
 </div>
 
-<!-- Audio player â€” only shows if episode has audio frontmatter -->
 {fm.audio && (
   <div class="ep-audio-wrap">
     <AudioPlayer src={fm.audio} title={fm.title} />
   </div>
 )}
 
-<!-- Table of contents (built from headings by JS) -->
 <div class="ep-toc-wrap" id="tocWrap" style="display:none">
   <button class="ep-toc-toggle" id="tocToggle">
     <span class="ep-toc-label">Table of Contents</span>
-    <span class="ep-toc-arrow">▾</span>
+    <span class="ep-toc-arrow">v</span>
   </button>
   <ul class="ep-toc-list" id="tocList"></ul>
 </div>
@@ -425,7 +402,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   </article>
 </div>
 
-<!-- Related episodes -->
 {related.length > 0 && (
   <div class="ep-related">
     <p class="ep-related-label">Also in this part</p>
@@ -456,13 +432,13 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 <div class="ep-nav">
   {prevPage ? (
     <a href={prevUrl} class="ep-nav-btn prev">
-      <div class="ep-nav-label">← Previous</div>
+      <div class="ep-nav-label">Previous</div>
       <div class="ep-nav-title">{prevPage.frontmatter.title}</div>
     </a>
   ) : <div class="ep-empty-nav"></div>}
   {nextPage ? (
     <a href={nextUrl} class="ep-nav-btn next">
-      <div class="ep-nav-label">Next ←’</div>
+      <div class="ep-nav-label">Next</div>
       <div class="ep-nav-title">{nextPage.frontmatter.title}</div>
     </a>
   ) : <div class="ep-empty-nav"></div>}
@@ -470,11 +446,9 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 
 <Footer />
 
-<!-- Back to top -->
-<button id="backToTop" aria-label="Back to top">←‘</button>
+<button id="backToTop" aria-label="Back to top">^</button>
 
 <script define:vars={{ prevUrl, nextUrl, slug, seriesKey }}>
-  // —— PROGRESS BAR ——
   const bar = document.getElementById('progressBar');
   const pct = document.getElementById('readingPct');
   const article = document.getElementById('epArticle');
@@ -491,14 +465,11 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     if (backToTop) backToTop.classList.toggle('visible', window.scrollY > 600);
   }, { passive: true });
 
-  // —— BACK TO TOP ——
   backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  // —— MARK AS READ (localStorage) ——
   const readKey = `read:${seriesKey}:${slug}`;
   localStorage.setItem(readKey, '1');
 
-  // —— TABLE OF CONTENTS ——
   const headings = article?.querySelectorAll('h2, h3');
   const tocWrap = document.getElementById('tocWrap');
   const tocList = document.getElementById('tocList');
@@ -529,7 +500,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     });
   }
 
-  // —— SHARE ——
   document.getElementById('shareBtn')?.addEventListener('click', () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('shareBtn');
@@ -540,7 +510,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     });
   });
 
-  // —— KEYBOARD NAV ——
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft' && prevUrl) window.location.href = prevUrl;
     if (e.key === 'ArrowRight' && nextUrl) window.location.href = nextUrl;
