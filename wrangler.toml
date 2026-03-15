@@ -1,0 +1,12 @@
+name = "ishistory"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-03-15"
+
+[[kv_namespaces]]
+binding = "REACTIONS"
+id = "64a398147be64e13ad4cab533a7af7c9"
+
+[[d1_databases]]
+binding = "NEWSLETTER_DB"
+database_name = "ishistory-newsletter"
+database_id = "8bca71fb-15ad-4ec0-b4da-afdd90552f67"
