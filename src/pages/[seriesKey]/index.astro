@@ -328,41 +328,4 @@ const otherSeries = Object.entries(allSeries).filter(([k]) => k !== seriesKey);
       card.classList.add('is-read');
     }
   });
-</script>            <div class="episode-roman">{fm.roman}</div>
-                <div>
-                  <div class="episode-tag">{fm.tag ?? 'Episode'}</div>
-                  <div class="episode-title">{fm.title}</div>
-                  <div class="episode-desc">{fm.description}</div>
-                </div>
-                <div class="episode-arrow">→</div>
-              </a>
-            );
-          })}
-        </div>
-      </div>
-    );
-  })}
-</section>
-
-<section class="other-series">
-  <p class="other-series-label">More from ishistory</p>
-  <div class="other-series-grid">
-    {otherSeries.map(([key, s]) => (
-      <a href={`/${key}/`} class="other-series-card">
-        <div class="other-series-card-label">ishistory Series</div>
-        <div class="other-series-card-title">{s.label}</div>
-        <p class="other-series-card-desc">{s.description}</p>
-      </a>
-    ))}
-  </div>
-</section>
-
-<Footer />
-
-<script>
-  const observer = new IntersectionObserver(
-    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-  );
-  document.querySelectorAll('.episode-card, .part-header').forEach(el => observer.observe(el));
 </script>
