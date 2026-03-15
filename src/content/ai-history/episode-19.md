@@ -1,5 +1,6 @@
 ---
 title: "AI in Industry"
+series: "ai-history"
 episode_number: 19
 roman: "XIX"
 part: "part-eight"
