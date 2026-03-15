@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import TranslateBanner from '../components/TranslateBanner.astro';
 
 interface Props {
   title: string;
@@ -76,5 +77,6 @@ const fullTitle = title.includes('ishistory') ? title : `${title} — ishistory`
 </head>
 <body>
   <slot />
+  <TranslateBanner />
 </body>
 </html>
