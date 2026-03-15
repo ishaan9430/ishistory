@@ -22,7 +22,6 @@ const {
   nextUrl
 } = Astro.props;
 
-const GA_ID = 'G-3N7G8QT9QF';
 const siteUrl = 'https://ishistory.pages.dev';
 const fullTitle = title.includes('ishistory') ? title : `${title} — ishistory`;
 ---
@@ -55,7 +54,6 @@ const fullTitle = title.includes('ishistory') ? title : `${title} — ishistory`
   <meta name="twitter:image" content={`${siteUrl}/og-image.png`} />
 
   <!-- Meta -->
-  <meta name="google-site-verification" content="QIPczEHb8LqQWqYu7edg-ib1ovSQX0gZg6ShjWbHedE" />
   <meta name="author" content="Ishaan" />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#07060a" />
@@ -67,14 +65,8 @@ const fullTitle = title.includes('ishistory') ? title : `${title} — ishistory`
   {prevUrl && <link rel="prev" href={prevUrl} />}
   {nextUrl && <link rel="next" href={nextUrl} />}
 
-  <!-- Google Analytics -->
-  <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-  <script define:vars={{ GA_ID }}>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', GA_ID);
-  </script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a819adc8385341768cfa0b89c0f05d29"}'></script>
 </head>
 <body>
   <slot />
