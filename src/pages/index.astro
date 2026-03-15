@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Cosmos from '../components/Cosmos.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Newsletter from '../components/Newsletter.astro';
 import { series } from '../data/series.js';
 ---
 
@@ -51,6 +52,8 @@ import { series } from '../data/series.js';
     </a>
   ))}
 </section>
+
+<Newsletter source="homepage" />
 
 <Footer />
 
