@@ -1,0 +1,237 @@
+---
+// No props needed — detection is done client-side
+---
+
+<div class="translate-banner" id="translateBanner" style="display:none">
+  <div class="translate-banner-inner">
+    <span class="translate-icon">🌐</span>
+    <p class="translate-text">
+      This page is in English.
+      <span class="translate-lang" id="translateLang"></span>
+    </p>
+    <div class="translate-actions">
+      <a
+        href="#"
+        class="translate-btn translate-btn-primary"
+        id="translateBtn"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Translate page
+      </a>
+      <button class="translate-btn translate-btn-dismiss" id="translateDismiss">
+        No thanks
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+.translate-banner {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  width: calc(100% - 3rem);
+  max-width: 540px;
+  background: rgba(20,18,24,0.97);
+  border: 1px solid rgba(200,151,58,0.2);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
+  transform: translateX(-50%) translateY(16px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.translate-banner.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.translate-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  flex-wrap: wrap;
+}
+.translate-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.translate-text {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9a8f7e;
+  flex: 1;
+  min-width: 140px;
+}
+.translate-lang {
+  color: #c8973a;
+  display: block;
+  margin-top: 0.15rem;
+}
+.translate-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+.translate-btn {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+}
+.translate-btn-primary {
+  background: #8b3a1a;
+  color: #f0e8d8;
+  border: 1px solid #8b3a1a;
+}
+.translate-btn-primary:hover {
+  background: #c4622a;
+  border-color: #c4622a;
+}
+.translate-btn-dismiss {
+  background: none;
+  color: #564b3c;
+  border: 1px solid rgba(160,144,120,0.2);
+}
+.translate-btn-dismiss:hover {
+  color: #9a8f7e;
+  border-color: rgba(160,144,120,0.4);
+}
+
+@media (max-width: 480px) {
+  .translate-banner { bottom: 1rem; width: calc(100% - 2rem); }
+  .translate-banner-inner { padding: 0.9rem 1rem; }
+}
+</style>
+
+<script>
+// English-speaking countries — no prompt needed for these
+const ENGLISH_COUNTRIES = new Set([
+  'US','GB','AU','CA','NZ','IE','ZA','JM','TT','BB',
+  'GH','KE','NG','UG','TZ','ZW','ZM','MW','BW','NA',
+  'SG','PH','IN','PK','BD','LK','MM','MT','CY'
+]);
+
+// Language names for display
+const LANG_NAMES: Record<string, string> = {
+  AF:'Dari/Pashto',AR:'Arabic',AZ:'Azerbaijani',BE:'Belarusian',
+  BG:'Bulgarian',BN:'Bengali',BS:'Bosnian',CS:'Czech',
+  DA:'Danish',DE:'German',EL:'Greek',ES:'Spanish',
+  ET:'Estonian',FA:'Persian',FI:'Finnish',FR:'French',
+  HE:'Hebrew',HI:'Hindi',HR:'Croatian',HU:'Hungarian',
+  HY:'Armenian',ID:'Indonesian',IS:'Icelandic',IT:'Italian',
+  JA:'Japanese',KA:'Georgian',KK:'Kazakh',KO:'Korean',
+  LT:'Lithuanian',LV:'Latvian',MK:'Macedonian',MN:'Mongolian',
+  MS:'Malay',MY:'Burmese',NL:'Dutch',NO:'Norwegian',
+  PL:'Polish',PT:'Portuguese',RO:'Romanian',RU:'Russian',
+  SK:'Slovak',SL:'Slovenian',SQ:'Albanian',SR:'Serbian',
+  SV:'Swedish',SW:'Swahili',TH:'Thai',TK:'Turkmen',
+  TR:'Turkish',UK:'Ukrainian',UR:'Urdu',UZ:'Uzbek',
+  VI:'Vietnamese',ZH:'Chinese',
+};
+
+// Google Translate language codes per country
+const COUNTRY_LANG: Record<string, string> = {
+  AF:'ps',AE:'ar',AL:'sq',AM:'am',AO:'pt',AR:'es',AT:'de',
+  AZ:'az',BA:'bs',BE:'fr',BF:'fr',BG:'bg',BH:'ar',BI:'fr',
+  BJ:'fr',BN:'ms',BO:'es',BR:'pt',BT:'dz',BY:'be',
+  CD:'fr',CF:'fr',CG:'fr',CH:'de',CI:'fr',CL:'es',
+  CM:'fr',CN:'zh-CN',CO:'es',CR:'es',CU:'es',CV:'pt',
+  CZ:'cs',DE:'de',DJ:'fr',DK:'da',DO:'es',DZ:'ar',
+  EC:'es',EE:'et',EG:'ar',ER:'ti',ES:'es',ET:'am',
+  FI:'fi',FJ:'fj',FM:'en',FR:'fr',GA:'fr',GE:'ka',
+  GN:'fr',GQ:'es',GR:'el',GT:'es',GW:'pt',GY:'es',
+  HN:'es',HR:'hr',HT:'ht',HU:'hu',ID:'id',IL:'he',
+  IQ:'ar',IR:'fa',IS:'is',IT:'it',JO:'ar',JP:'ja',
+  KE:'sw',KG:'ky',KH:'km',KI:'en',KM:'ar',KP:'ko',
+  KR:'ko',KW:'ar',KZ:'kk',LA:'lo',LB:'ar',LI:'de',
+  LK:'si',LR:'en',LS:'st',LT:'lt',LU:'fr',LV:'lv',
+  LY:'ar',MA:'ar',MC:'fr',MD:'ro',ME:'sr',MG:'mg',
+  ML:'fr',MN:'mn',MR:'ar',MU:'fr',MV:'dv',MX:'es',
+  MY:'ms',MZ:'pt',NA:'af',NE:'fr',NI:'es',NL:'nl',
+  NO:'no',NP:'ne',OM:'ar',PA:'es',PE:'es',PG:'en',
+  PL:'pl',PS:'ar',PT:'pt',PW:'en',PY:'es',QA:'ar',
+  RO:'ro',RS:'sr',RU:'ru',RW:'rw',SA:'ar',SB:'en',
+  SD:'ar',SE:'sv',SI:'sl',SK:'sk',SL:'en',SM:'it',
+  SN:'fr',SO:'so',SR:'nl',SS:'en',ST:'pt',SV:'es',
+  SY:'ar',SZ:'en',TD:'fr',TG:'fr',TH:'th',TJ:'tg',
+  TL:'pt',TM:'tk',TN:'ar',TO:'en',TR:'tr',TV:'en',
+  TW:'zh-TW',UA:'uk',UY:'es',UZ:'uz',VA:'it',
+  VE:'es',VN:'vi',VU:'fr',WS:'sm',YE:'ar',
+};
+
+const DISMISSED_KEY = 'translate-dismissed';
+
+async function init() {
+  // Don't show if already dismissed (within 30 days)
+  // Dismissed only for this session (tab/window)
+  if (sessionStorage.getItem(DISMISSED_KEY)) return;
+
+  // Get country from Cloudflare header via a lightweight fetch
+  let country = '';
+  try {
+    const res = await fetch('/api/geo');
+    if (res.ok) {
+      const data = await res.json();
+      country = data.country ?? '';
+    }
+  } catch {
+    return; // Silently fail — never break the page
+  }
+
+  if (!country || ENGLISH_COUNTRIES.has(country)) return;
+
+  const langCode = COUNTRY_LANG[country];
+  const langName = LANG_NAMES[country] ?? '';
+  if (!langCode) return;
+
+  const banner = document.getElementById('translateBanner');
+  const langEl = document.getElementById('translateLang');
+  const translateBtn = document.getElementById('translateBtn') as HTMLAnchorElement;
+  const dismissBtn = document.getElementById('translateDismiss');
+
+  if (!banner || !langEl || !translateBtn) return;
+
+  // Set language hint
+  if (langName) langEl.textContent = `Translate to ${langName}?`;
+
+  // Build Google Translate URL
+  const pageUrl = encodeURIComponent(window.location.href);
+  translateBtn.href = `https://translate.google.com/translate?sl=en&tl=${langCode}&u=${pageUrl}`;
+
+  // Show banner
+  banner.style.display = 'block';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => banner.classList.add('visible'));
+  });
+
+  // Dismiss
+  dismissBtn?.addEventListener('click', () => {
+    banner.classList.remove('visible');
+    setTimeout(() => banner.style.display = 'none', 350);
+    sessionStorage.setItem(DISMISSED_KEY, '1');
+  });
+
+  // Also hide when translate link is clicked
+  translateBtn.addEventListener('click', () => {
+    sessionStorage.setItem(DISMISSED_KEY, '1');
+  });
+}
+
+// Run after page load
+if (document.readyState === 'complete') init();
+else window.addEventListener('load', init);
+</script>
