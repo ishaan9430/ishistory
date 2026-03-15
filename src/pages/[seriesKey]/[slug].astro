@@ -5,6 +5,7 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import { series as allSeries } from '../../data/series.js';
 import ListenButton from '../../components/ListenButton.astro';
+import AudioPlayer from '../../components/AudioPlayer.astro';
 
 export async function getStaticPaths() {
   const allContent = await Astro.glob('../../content/**/*.md');
@@ -355,7 +356,14 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 #backToTop.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
 #backToTop:hover { border-color: #c8973a; color: #c8973a; }
 
+.ep-audio-wrap {
+  background: linear-gradient(160deg, #0d0b10 0%, #16121a 100%);
+  padding: 1.5rem 3rem;
+  border-bottom: 1px solid rgba(200,151,58,0.09);
+  position: relative; z-index: 1;
+}
 @media (max-width: 768px) {
+  .ep-audio-wrap { padding: 1.2rem 1.5rem; }
   .ep-hero { padding: 6rem 1.5rem 3rem; }
   .ep-reading-bar { padding: 0.7rem 1.5rem; }
   .ep-toc-wrap { margin: 0 1.5rem; }
@@ -393,6 +401,13 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   <span class="ep-reading-text">{seriesMeta.label}</span>
   <span id="readingPct">0%</span>
 </div>
+
+<!-- Audio player — only shows if episode has audio frontmatter -->
+{fm.audio && (
+  <div class="ep-audio-wrap">
+    <AudioPlayer src={fm.audio} title={fm.title} />
+  </div>
+)}
 
 <!-- Table of contents (built from headings by JS) -->
 <div class="ep-toc-wrap" id="tocWrap" style="display:none">
