@@ -1,11 +1,9 @@
 ---
-// No props — reads whatever is in .ep-article on the page
 ---
 
 <div class="listen-wrap" id="listenWrap">
   <button class="listen-btn" id="listenBtn" aria-label="Listen to this article">
     <span class="listen-icon" id="listenIcon">
-      <!-- Play icon -->
       <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
         <path d="M8 5v14l11-7z"/>
       </svg>
@@ -13,7 +11,6 @@
     <span class="listen-label" id="listenLabel">Listen to article</span>
   </button>
 
-  <!-- Controls shown while playing -->
   <div class="listen-controls" id="listenControls" style="display:none">
     <button class="listen-ctrl" id="listenPause" aria-label="Pause">
       <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
@@ -34,8 +31,7 @@
 
 <style>
 .listen-wrap {
-  display: flex; align-items: center; gap: 1rem;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
 }
 .listen-btn {
   display: inline-flex; align-items: center; gap: 0.55rem;
@@ -50,8 +46,6 @@
 }
 .listen-btn:hover { border-color: #c8973a; color: #c8973a; }
 .listen-btn.active { border-color: #c8973a; color: #c8973a; background: rgba(200,151,58,0.06); }
-.listen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
 .listen-icon { display: flex; align-items: center; flex-shrink: 0; }
 
 .listen-controls {
@@ -66,8 +60,7 @@
   border-radius: 50%; cursor: pointer;
   color: #9a8f7e; transition: all 0.2s; flex-shrink: 0;
 }
-.listen-ctrl:hover { background: rgba(200,151,58,0.16); color: #c8973a; border-color: #c8973a; }
-
+.listen-ctrl:hover { background: rgba(200,151,58,0.16); color: #c8973a; }
 .listen-progress-wrap {
   flex: 1; height: 2px;
   background: rgba(200,151,58,0.12);
@@ -76,17 +69,13 @@
 .listen-progress-bar {
   height: 100%; width: 0%;
   background: linear-gradient(to right, #8b3a1a, #c8973a);
-  border-radius: 2px;
-  transition: width 0.5s linear;
+  border-radius: 2px; transition: width 0.5s linear;
 }
 .listen-time {
   font-family: 'DM Mono', monospace;
   font-size: 0.55rem; letter-spacing: 0.1em;
-  color: #564b3c; flex-shrink: 0; min-width: 28px;
-  text-align: right;
+  color: #564b3c; flex-shrink: 0; min-width: 28px; text-align: right;
 }
-
-/* Not supported message */
 .listen-unsupported {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 0.58rem; letter-spacing: 0.12em;
@@ -105,38 +94,26 @@ const progressBar = document.getElementById('listenProgressBar')!;
 const timeEl = document.getElementById('listenTime')!;
 const wrap = document.getElementById('listenWrap')!;
 
-// Check browser support
 if (!('speechSynthesis' in window)) {
   wrap.innerHTML = '<span class="listen-unsupported">Audio not supported in this browser</span>';
 } else {
   const synth = window.speechSynthesis;
   let utterance: SpeechSynthesisUtterance | null = null;
   let isPaused = false;
-  let charIndex = 0;
   let totalLength = 0;
 
-  // Extract clean text from article
+  const PAUSE_SVG = `<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  const PLAY_SVG  = `<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>`;
+  const PAUSE_CTRL_SVG = `<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  const PLAY_CTRL_SVG  = `<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M8 5v14l11-7z"/></svg>`;
+
   function getArticleText(): string {
     const article = document.querySelector('.ep-article');
     if (!article) return '';
-
-    // Clone so we don't affect the page
     const clone = article.cloneNode(true) as HTMLElement;
-
-    // Remove elements that shouldn't be read
     clone.querySelectorAll('.ep-toc-wrap, script, style').forEach(el => el.remove());
-
-    // Get text and clean it up
-    return (clone.textContent ?? '')
-      .replace(/\s+/g, ' ')
-      .replace(/\n+/g, ' ')
-      .trim();
+    return (clone.textContent ?? '').replace(/\s+/g, ' ').trim();
   }
-
-  // Pause icon SVG
-  const pauseSVG = `<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-  // Play icon SVG
-  const playSVG = `<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>`;
 
   function setProgress(index: number, total: number) {
     const pct = total > 0 ? Math.round((index / total) * 100) : 0;
@@ -147,57 +124,96 @@ if (!('speechSynthesis' in window)) {
   function resetUI() {
     btn.classList.remove('active');
     label.textContent = 'Listen to article';
-    icon.innerHTML = playSVG;
+    icon.innerHTML = PLAY_SVG;
     controls.style.display = 'none';
+    pauseBtn.innerHTML = PAUSE_CTRL_SVG;
     progressBar.style.width = '0%';
     timeEl.textContent = '0%';
     isPaused = false;
     utterance = null;
   }
 
-  btn.addEventListener('click', () => {
-    if (synth.speaking && !isPaused) return;
+  // Load voices — critical fix for mobile Chrome
+  // Voices load asynchronously; we must wait for them
+  function getVoices(): Promise<SpeechSynthesisVoice[]> {
+    return new Promise(resolve => {
+      const voices = synth.getVoices();
+      if (voices.length > 0) { resolve(voices); return; }
+      // Not loaded yet — wait for event
+      synth.addEventListener('voiceschanged', () => resolve(synth.getVoices()), { once: true });
+      // Fallback timeout in case event never fires
+      setTimeout(() => resolve(synth.getVoices()), 1000);
+    });
+  }
 
+  function pickVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+    // Prefer high-quality English voices by name
+    const preferred = ['Daniel', 'Karen', 'Samantha', 'Google UK English Male',
+                       'Google UK English Female', 'Microsoft David', 'Microsoft Zira'];
+    for (const name of preferred) {
+      const v = voices.find(v => v.name.includes(name));
+      if (v) return v;
+    }
+    // Fall back to any English voice
+    return voices.find(v => v.lang.startsWith('en')) ?? voices[0] ?? null;
+  }
+
+  btn.addEventListener('click', async () => {
+    // Resume if paused
     if (isPaused) {
       synth.resume();
       isPaused = false;
       btn.classList.add('active');
       label.textContent = 'Listening…';
-      icon.innerHTML = pauseSVG;
+      icon.innerHTML = PAUSE_SVG;
+      pauseBtn.innerHTML = PAUSE_CTRL_SVG;
       return;
     }
 
-    synth.cancel();
+    // Already speaking — ignore double click
+    if (synth.speaking) return;
+
     const text = getArticleText();
-    if (!text) return;
+    if (!text) { label.textContent = 'No content found'; return; }
 
     totalLength = text.length;
+
+    // Show loading state
+    btn.classList.add('active');
+    label.textContent = 'Loading voice…';
+
+    // Cancel any existing speech
+    synth.cancel();
+
+    // Wait for voices to be ready
+    const voices = await getVoices();
+    const voice = pickVoice(voices);
+
     utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
+    utterance.rate = 0.92;
     utterance.pitch = 1;
     utterance.lang = 'en-GB';
+    if (voice) utterance.voice = voice;
 
-    // Pick a good voice if available
-    const voices = synth.getVoices();
-    const preferred = voices.find(v =>
-      v.lang.startsWith('en') && (v.name.includes('Daniel') || v.name.includes('Karen') || v.name.includes('Samantha'))
-    ) ?? voices.find(v => v.lang.startsWith('en'));
-    if (preferred) utterance.voice = preferred;
+    utterance.onstart = () => {
+      label.textContent = 'Listening…';
+      icon.innerHTML = PAUSE_SVG;
+      controls.style.display = 'flex';
+    };
 
     utterance.onboundary = (e) => {
-      charIndex = e.charIndex;
-      setProgress(charIndex, totalLength);
+      setProgress(e.charIndex, totalLength);
     };
 
     utterance.onend = () => resetUI();
-    utterance.onerror = () => resetUI();
+    utterance.onerror = (e) => {
+      // 'interrupted' fires when we cancel intentionally — ignore
+      if (e.error === 'interrupted' || e.error === 'canceled') return;
+      resetUI();
+      label.textContent = 'Listen to article';
+    };
 
     synth.speak(utterance);
-
-    btn.classList.add('active');
-    label.textContent = 'Listening…';
-    icon.innerHTML = pauseSVG;
-    controls.style.display = 'flex';
   });
 
   // Pause / resume
@@ -207,25 +223,30 @@ if (!('speechSynthesis' in window)) {
       isPaused = true;
       btn.classList.remove('active');
       label.textContent = 'Paused';
-      icon.innerHTML = playSVG;
-      pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M8 5v14l11-7z"/></svg>`;
+      icon.innerHTML = PLAY_SVG;
+      pauseBtn.innerHTML = PLAY_CTRL_SVG;
     } else if (isPaused) {
       synth.resume();
       isPaused = false;
       btn.classList.add('active');
       label.textContent = 'Listening…';
-      icon.innerHTML = pauseSVG;
-      pauseBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+      icon.innerHTML = PAUSE_SVG;
+      pauseBtn.innerHTML = PAUSE_CTRL_SVG;
     }
   });
 
   // Stop
-  stopBtn.addEventListener('click', () => {
-    synth.cancel();
-    resetUI();
-  });
+  stopBtn.addEventListener('click', () => { synth.cancel(); resetUI(); });
 
-  // Stop if user navigates away
+  // Stop on navigation
   window.addEventListener('beforeunload', () => synth.cancel());
+
+  // Fix for Chrome bug — speech stops after ~15 seconds without this
+  setInterval(() => {
+    if (synth.speaking && !isPaused) {
+      synth.pause();
+      synth.resume();
+    }
+  }, 10000);
 }
 </script>

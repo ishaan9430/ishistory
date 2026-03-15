@@ -1,5 +1,5 @@
 ---
-// No props needed — detection is done client-side
+// Geo detection via browser navigator.language — no server needed
 ---
 
 <div class="translate-banner" id="translateBanner" style="display:none">
@@ -16,9 +16,7 @@
         id="translateBtn"
         target="_blank"
         rel="noopener noreferrer"
-      >
-        Translate page
-      </a>
+      >Translate page</a>
       <button class="translate-btn translate-btn-dismiss" id="translateDismiss">
         No thanks
       </button>
@@ -29,8 +27,7 @@
 <style>
 .translate-banner {
   position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
+  bottom: 1.5rem; left: 50%;
   transform: translateX(-50%);
   z-index: 500;
   width: calc(100% - 3rem);
@@ -50,66 +47,40 @@
   transform: translateX(-50%) translateY(0);
 }
 .translate-banner-inner {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 1rem 1.25rem; flex-wrap: wrap;
 }
-.translate-icon {
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
+.translate-icon { font-size: 1.1rem; flex-shrink: 0; }
 .translate-text {
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #9a8f7e;
-  flex: 1;
-  min-width: 140px;
+  font-size: 0.65rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #9a8f7e;
+  flex: 1; min-width: 140px;
 }
 .translate-lang {
-  color: #c8973a;
-  display: block;
-  margin-top: 0.15rem;
+  color: #c8973a; display: block; margin-top: 0.15rem;
 }
 .translate-actions {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-  flex-shrink: 0;
+  display: flex; gap: 0.6rem; align-items: center; flex-shrink: 0;
 }
 .translate-btn {
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
+  font-size: 0.6rem; letter-spacing: 0.18em;
+  text-transform: uppercase; cursor: pointer;
+  border-radius: 4px; transition: all 0.2s;
+  text-decoration: none; padding: 0.5rem 1rem;
   white-space: nowrap;
 }
 .translate-btn-primary {
-  background: #8b3a1a;
-  color: #f0e8d8;
+  background: #8b3a1a; color: #f0e8d8;
   border: 1px solid #8b3a1a;
 }
-.translate-btn-primary:hover {
-  background: #c4622a;
-  border-color: #c4622a;
-}
+.translate-btn-primary:hover { background: #c4622a; border-color: #c4622a; }
 .translate-btn-dismiss {
-  background: none;
-  color: #564b3c;
+  background: none; color: #564b3c;
   border: 1px solid rgba(160,144,120,0.2);
 }
-.translate-btn-dismiss:hover {
-  color: #9a8f7e;
-  border-color: rgba(160,144,120,0.4);
-}
+.translate-btn-dismiss:hover { color: #9a8f7e; border-color: rgba(160,144,120,0.4); }
 
 @media (max-width: 480px) {
   .translate-banner { bottom: 1rem; width: calc(100% - 2rem); }
@@ -118,85 +89,92 @@
 </style>
 
 <script>
-// English-speaking countries — no prompt needed for these
-const ENGLISH_COUNTRIES = new Set([
-  'US','GB','AU','CA','NZ','IE','ZA','JM','TT','BB',
-  'GH','KE','NG','UG','TZ','ZW','ZM','MW','BW','NA',
-  'SG','PH','IN','PK','BD','LK','MM','MT','CY'
-]);
-
-// Language names for display
-const LANG_NAMES: Record<string, string> = {
-  AF:'Dari/Pashto',AR:'Arabic',AZ:'Azerbaijani',BE:'Belarusian',
-  BG:'Bulgarian',BN:'Bengali',BS:'Bosnian',CS:'Czech',
-  DA:'Danish',DE:'German',EL:'Greek',ES:'Spanish',
-  ET:'Estonian',FA:'Persian',FI:'Finnish',FR:'French',
-  HE:'Hebrew',HI:'Hindi',HR:'Croatian',HU:'Hungarian',
-  HY:'Armenian',ID:'Indonesian',IS:'Icelandic',IT:'Italian',
-  JA:'Japanese',KA:'Georgian',KK:'Kazakh',KO:'Korean',
-  LT:'Lithuanian',LV:'Latvian',MK:'Macedonian',MN:'Mongolian',
-  MS:'Malay',MY:'Burmese',NL:'Dutch',NO:'Norwegian',
-  PL:'Polish',PT:'Portuguese',RO:'Romanian',RU:'Russian',
-  SK:'Slovak',SL:'Slovenian',SQ:'Albanian',SR:'Serbian',
-  SV:'Swedish',SW:'Swahili',TH:'Thai',TK:'Turkmen',
-  TR:'Turkish',UK:'Ukrainian',UR:'Urdu',UZ:'Uzbek',
-  VI:'Vietnamese',ZH:'Chinese',
-};
-
-// Google Translate language codes per country
-const COUNTRY_LANG: Record<string, string> = {
-  AF:'ps',AE:'ar',AL:'sq',AM:'am',AO:'pt',AR:'es',AT:'de',
-  AZ:'az',BA:'bs',BE:'fr',BF:'fr',BG:'bg',BH:'ar',BI:'fr',
-  BJ:'fr',BN:'ms',BO:'es',BR:'pt',BT:'dz',BY:'be',
-  CD:'fr',CF:'fr',CG:'fr',CH:'de',CI:'fr',CL:'es',
-  CM:'fr',CN:'zh-CN',CO:'es',CR:'es',CU:'es',CV:'pt',
-  CZ:'cs',DE:'de',DJ:'fr',DK:'da',DO:'es',DZ:'ar',
-  EC:'es',EE:'et',EG:'ar',ER:'ti',ES:'es',ET:'am',
-  FI:'fi',FJ:'fj',FM:'en',FR:'fr',GA:'fr',GE:'ka',
-  GN:'fr',GQ:'es',GR:'el',GT:'es',GW:'pt',GY:'es',
-  HN:'es',HR:'hr',HT:'ht',HU:'hu',ID:'id',IL:'he',
-  IQ:'ar',IR:'fa',IS:'is',IT:'it',JO:'ar',JP:'ja',
-  KE:'sw',KG:'ky',KH:'km',KI:'en',KM:'ar',KP:'ko',
-  KR:'ko',KW:'ar',KZ:'kk',LA:'lo',LB:'ar',LI:'de',
-  LK:'si',LR:'en',LS:'st',LT:'lt',LU:'fr',LV:'lv',
-  LY:'ar',MA:'ar',MC:'fr',MD:'ro',ME:'sr',MG:'mg',
-  ML:'fr',MN:'mn',MR:'ar',MU:'fr',MV:'dv',MX:'es',
-  MY:'ms',MZ:'pt',NA:'af',NE:'fr',NI:'es',NL:'nl',
-  NO:'no',NP:'ne',OM:'ar',PA:'es',PE:'es',PG:'en',
-  PL:'pl',PS:'ar',PT:'pt',PW:'en',PY:'es',QA:'ar',
-  RO:'ro',RS:'sr',RU:'ru',RW:'rw',SA:'ar',SB:'en',
-  SD:'ar',SE:'sv',SI:'sl',SK:'sk',SL:'en',SM:'it',
-  SN:'fr',SO:'so',SR:'nl',SS:'en',ST:'pt',SV:'es',
-  SY:'ar',SZ:'en',TD:'fr',TG:'fr',TH:'th',TJ:'tg',
-  TL:'pt',TM:'tk',TN:'ar',TO:'en',TR:'tr',TV:'en',
-  TW:'zh-TW',UA:'uk',UY:'es',UZ:'uz',VA:'it',
-  VE:'es',VN:'vi',VU:'fr',WS:'sm',YE:'ar',
+// Map browser language codes to Google Translate target codes + display names
+const LANG_MAP: Record<string, { code: string; name: string }> = {
+  af:{ code:'af', name:'Afrikaans' },
+  ar:{ code:'ar', name:'Arabic' },
+  az:{ code:'az', name:'Azerbaijani' },
+  be:{ code:'be', name:'Belarusian' },
+  bg:{ code:'bg', name:'Bulgarian' },
+  bn:{ code:'bn', name:'Bengali' },
+  bs:{ code:'bs', name:'Bosnian' },
+  ca:{ code:'ca', name:'Catalan' },
+  cs:{ code:'cs', name:'Czech' },
+  cy:{ code:'cy', name:'Welsh' },
+  da:{ code:'da', name:'Danish' },
+  de:{ code:'de', name:'German' },
+  el:{ code:'el', name:'Greek' },
+  es:{ code:'es', name:'Spanish' },
+  et:{ code:'et', name:'Estonian' },
+  eu:{ code:'eu', name:'Basque' },
+  fa:{ code:'fa', name:'Persian' },
+  fi:{ code:'fi', name:'Finnish' },
+  fr:{ code:'fr', name:'French' },
+  gl:{ code:'gl', name:'Galician' },
+  gu:{ code:'gu', name:'Gujarati' },
+  he:{ code:'iw', name:'Hebrew' },
+  hi:{ code:'hi', name:'Hindi' },
+  hr:{ code:'hr', name:'Croatian' },
+  hu:{ code:'hu', name:'Hungarian' },
+  hy:{ code:'hy', name:'Armenian' },
+  id:{ code:'id', name:'Indonesian' },
+  is:{ code:'is', name:'Icelandic' },
+  it:{ code:'it', name:'Italian' },
+  ja:{ code:'ja', name:'Japanese' },
+  ka:{ code:'ka', name:'Georgian' },
+  kk:{ code:'kk', name:'Kazakh' },
+  km:{ code:'km', name:'Khmer' },
+  ko:{ code:'ko', name:'Korean' },
+  lt:{ code:'lt', name:'Lithuanian' },
+  lv:{ code:'lv', name:'Latvian' },
+  mk:{ code:'mk', name:'Macedonian' },
+  ml:{ code:'ml', name:'Malayalam' },
+  mn:{ code:'mn', name:'Mongolian' },
+  mr:{ code:'mr', name:'Marathi' },
+  ms:{ code:'ms', name:'Malay' },
+  my:{ code:'my', name:'Burmese' },
+  ne:{ code:'ne', name:'Nepali' },
+  nl:{ code:'nl', name:'Dutch' },
+  no:{ code:'no', name:'Norwegian' },
+  pa:{ code:'pa', name:'Punjabi' },
+  pl:{ code:'pl', name:'Polish' },
+  pt:{ code:'pt', name:'Portuguese' },
+  ro:{ code:'ro', name:'Romanian' },
+  ru:{ code:'ru', name:'Russian' },
+  si:{ code:'si', name:'Sinhala' },
+  sk:{ code:'sk', name:'Slovak' },
+  sl:{ code:'sl', name:'Slovenian' },
+  sq:{ code:'sq', name:'Albanian' },
+  sr:{ code:'sr', name:'Serbian' },
+  sv:{ code:'sv', name:'Swedish' },
+  sw:{ code:'sw', name:'Swahili' },
+  ta:{ code:'ta', name:'Tamil' },
+  te:{ code:'te', name:'Telugu' },
+  th:{ code:'th', name:'Thai' },
+  tl:{ code:'tl', name:'Filipino' },
+  tr:{ code:'tr', name:'Turkish' },
+  uk:{ code:'uk', name:'Ukrainian' },
+  ur:{ code:'ur', name:'Urdu' },
+  uz:{ code:'uz', name:'Uzbek' },
+  vi:{ code:'vi', name:'Vietnamese' },
+  zh:{ code:'zh-CN', name:'Chinese' },
 };
 
 const DISMISSED_KEY = 'translate-dismissed';
 
-async function init() {
-  // Don't show if already dismissed (within 30 days)
-  // Dismissed only for this session (tab/window)
+function init() {
+  // Dismissed for this session
   if (sessionStorage.getItem(DISMISSED_KEY)) return;
 
-  // Get country from Cloudflare header via a lightweight fetch
-  let country = '';
-  try {
-    const res = await fetch('/api/geo');
-    if (res.ok) {
-      const data = await res.json();
-      country = data.country ?? '';
-    }
-  } catch {
-    return; // Silently fail — never break the page
-  }
+  // Get browser language (e.g. "fr-FR", "de", "zh-TW")
+  const browserLang = (navigator.language || navigator.languages?.[0] || '').toLowerCase();
+  const langBase = browserLang.split('-')[0]; // "fr-FR" → "fr"
 
-  if (!country || ENGLISH_COUNTRIES.has(country)) return;
+  // Skip English speakers
+  if (!langBase || langBase === 'en') return;
 
-  const langCode = COUNTRY_LANG[country];
-  const langName = LANG_NAMES[country] ?? '';
-  if (!langCode) return;
+  const lang = LANG_MAP[langBase];
+  if (!lang) return;
 
   const banner = document.getElementById('translateBanner');
   const langEl = document.getElementById('translateLang');
@@ -205,33 +183,28 @@ async function init() {
 
   if (!banner || !langEl || !translateBtn) return;
 
-  // Set language hint
-  if (langName) langEl.textContent = `Translate to ${langName}?`;
+  langEl.textContent = `Translate to ${lang.name}?`;
 
-  // Build Google Translate URL
   const pageUrl = encodeURIComponent(window.location.href);
-  translateBtn.href = `https://translate.google.com/translate?sl=en&tl=${langCode}&u=${pageUrl}`;
+  translateBtn.href = `https://translate.google.com/translate?sl=en&tl=${lang.code}&u=${pageUrl}`;
 
-  // Show banner
+  // Show with slight delay so it doesn't feel instant/jarring
   banner.style.display = 'block';
-  requestAnimationFrame(() => {
+  setTimeout(() => {
     requestAnimationFrame(() => banner.classList.add('visible'));
-  });
+  }, 2000);
 
-  // Dismiss
   dismissBtn?.addEventListener('click', () => {
     banner.classList.remove('visible');
-    setTimeout(() => banner.style.display = 'none', 350);
+    setTimeout(() => { banner.style.display = 'none'; }, 350);
     sessionStorage.setItem(DISMISSED_KEY, '1');
   });
 
-  // Also hide when translate link is clicked
   translateBtn.addEventListener('click', () => {
     sessionStorage.setItem(DISMISSED_KEY, '1');
   });
 }
 
-// Run after page load
 if (document.readyState === 'complete') init();
 else window.addEventListener('load', init);
 </script>
