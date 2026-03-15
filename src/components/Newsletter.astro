@@ -1,0 +1,191 @@
+---
+interface Props {
+  source?: string;
+}
+const { source = 'website' } = Astro.props;
+---
+
+<div class="newsletter-wrap">
+  <div class="newsletter-inner">
+    <div class="newsletter-left">
+      <p class="newsletter-eyebrow">Stay in the loop</p>
+      <h2 class="newsletter-title">New episodes, <em>straight to you</em></h2>
+      <p class="newsletter-desc">
+        Get notified when new episodes drop across all three series. No spam, ever.
+      </p>
+    </div>
+    <div class="newsletter-right">
+      <form class="newsletter-form" id="newsletterForm">
+        <div class="newsletter-input-wrap">
+          <input
+            type="email"
+            id="newsletterEmail"
+            class="newsletter-input"
+            placeholder="your@email.com"
+            autocomplete="email"
+            required
+          />
+          <button type="submit" class="newsletter-btn" id="newsletterBtn">
+            <span id="newsletterBtnText">Subscribe</span>
+            <span id="newsletterBtnLoader" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <p class="newsletter-error" id="newsletterError" style="display:none"></p>
+      </form>
+      <p class="newsletter-success" id="newsletterSuccess" style="display:none">
+        ✓ You're on the list! We'll let you know when new episodes drop.
+      </p>
+      <p class="newsletter-privacy">
+        No spam. Unsubscribe any time.
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+.newsletter-wrap {
+  background: linear-gradient(135deg, rgba(20,15,10,0.95) 0%, rgba(13,11,16,0.98) 100%);
+  border: 1px solid rgba(200,151,58,0.15);
+  border-radius: 12px;
+  margin: 0 3rem 4rem;
+  overflow: hidden;
+  position: relative; z-index: 1;
+}
+.newsletter-wrap::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, #8b3a1a, #c8973a, transparent);
+}
+.newsletter-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem; padding: 3rem;
+  align-items: center;
+}
+.newsletter-eyebrow {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem; letter-spacing: 0.28em;
+  text-transform: uppercase; color: #c4622a;
+  margin-bottom: 0.75rem; opacity: 0.85;
+}
+.newsletter-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 700; color: #f0e8d8;
+  line-height: 1.2; margin-bottom: 1rem;
+}
+.newsletter-title em {
+  font-style: italic; font-weight: 400; color: #c8973a;
+}
+.newsletter-desc {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem; line-height: 1.7;
+  color: #9a8f7e; font-style: italic;
+}
+.newsletter-input-wrap {
+  display: flex; gap: 0;
+  border: 1px solid rgba(160,144,120,0.2);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s;
+}
+.newsletter-input-wrap:focus-within {
+  border-color: rgba(200,151,58,0.4);
+}
+.newsletter-input {
+  flex: 1; padding: 0.85rem 1.1rem;
+  background: rgba(13,11,16,0.8);
+  border: none; outline: none;
+  color: #e4d9c4;
+  font-family: 'Crimson Pro', serif; font-size: 1rem;
+}
+.newsletter-input::placeholder { color: #3a3028; font-style: italic; }
+.newsletter-btn {
+  padding: 0.85rem 1.4rem;
+  background: #8b3a1a; color: #f0e8d8;
+  border: none; cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.62rem; letter-spacing: 0.18em;
+  text-transform: uppercase; white-space: nowrap;
+  display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.newsletter-btn:hover { background: #c4622a; }
+.newsletter-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.newsletter-btn svg { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.newsletter-error {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.6rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #e06060;
+}
+.newsletter-success {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem; font-style: italic;
+  color: #5a9; line-height: 1.6;
+}
+.newsletter-privacy {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.55rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #3a3028;
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 768px) {
+  .newsletter-wrap { margin: 0 1.5rem 3rem; }
+  .newsletter-inner { grid-template-columns: 1fr; gap: 1.5rem; padding: 2rem 1.5rem; }
+}
+</style>
+
+<script define:vars={{ source }}>
+const form = document.getElementById('newsletterForm');
+const emailInput = document.getElementById('newsletterEmail');
+const btn = document.getElementById('newsletterBtn');
+const btnText = document.getElementById('newsletterBtnText');
+const btnLoader = document.getElementById('newsletterBtnLoader');
+const errorEl = document.getElementById('newsletterError');
+const successEl = document.getElementById('newsletterSuccess');
+
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = emailInput.value.trim();
+  if (!email) return;
+
+  // Loading state
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoader.style.display = 'flex';
+  errorEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/newsletter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      form.style.display = 'none';
+      successEl.style.display = 'block';
+    } else {
+      errorEl.textContent = data.error ?? 'Something went wrong. Please try again.';
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btnText.style.display = 'inline';
+      btnLoader.style.display = 'none';
+    }
+  } catch {
+    errorEl.textContent = 'Network error. Please try again.';
+    errorEl.style.display = 'block';
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    btnLoader.style.display = 'none';
+  }
+});
+</script>

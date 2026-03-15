@@ -1,0 +1,150 @@
+---
+interface Props {
+  slug: string;
+  series: string;
+}
+const { slug, series } = Astro.props;
+const episodeSlug = `${series}:${slug}`;
+---
+
+<div class="reactions-wrap" id="reactionsWrap">
+  <p class="reactions-label">Did you enjoy this episode?</p>
+  <div class="reactions-row" id="reactionsRow">
+    {['❤️','🔥','🤯','📚','👏'].map(emoji => (
+      <button
+        class="reaction-btn"
+        data-emoji={emoji}
+        aria-label={`React with ${emoji}`}
+      >
+        <span class="reaction-emoji">{emoji}</span>
+        <span class="reaction-count">0</span>
+      </button>
+    ))}
+  </div>
+  <p class="reactions-thanks" id="reactionsThanks" style="display:none">
+    Thanks for your reaction! ✨
+  </p>
+</div>
+
+<style>
+.reactions-wrap {
+  padding: 2rem 3rem;
+  border-top: 1px solid rgba(200,151,58,0.09);
+  background: rgba(13,11,16,0.5);
+  position: relative; z-index: 1;
+}
+.reactions-label {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.62rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: #564b3c;
+  margin-bottom: 1rem;
+}
+.reactions-row {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.reaction-btn {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.3rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(20,18,24,0.8);
+  border: 1px solid rgba(160,144,120,0.1);
+  border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; min-width: 56px;
+}
+.reaction-btn:hover {
+  background: rgba(200,151,58,0.08);
+  border-color: rgba(200,151,58,0.25);
+  transform: translateY(-2px);
+}
+.reaction-btn.reacted {
+  background: rgba(200,151,58,0.12);
+  border-color: rgba(200,151,58,0.35);
+}
+.reaction-emoji { font-size: 1.4rem; line-height: 1; }
+.reaction-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.08em;
+  color: #564b3c;
+}
+.reaction-btn.reacted .reaction-count { color: #c8973a; }
+.reactions-thanks {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem; font-style: italic;
+  color: #c8973a; margin-top: 1rem;
+}
+@media (max-width: 768px) {
+  .reactions-wrap { padding: 1.5rem; }
+}
+</style>
+
+<script define:vars={{ episodeSlug }}>
+const API = '/api/reactions';
+const REACTED_KEY = `reacted:${episodeSlug}`;
+
+async function loadCounts() {
+  try {
+    const res = await fetch(`${API}?slug=${encodeURIComponent(episodeSlug)}`);
+    if (!res.ok) return;
+    const counts = await res.json();
+    document.querySelectorAll('.reaction-btn').forEach(btn => {
+      const emoji = btn.getAttribute('data-emoji');
+      const countEl = btn.querySelector('.reaction-count');
+      if (countEl && emoji) countEl.textContent = counts[emoji] ?? 0;
+    });
+  } catch {}
+}
+
+async function react(emoji, btn) {
+  // Optimistic UI
+  const countEl = btn.querySelector('.reaction-count');
+  const current = parseInt(countEl.textContent ?? '0');
+  countEl.textContent = current + 1;
+  btn.classList.add('reacted');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}?slug=${encodeURIComponent(episodeSlug)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emoji })
+    });
+    if (res.ok) {
+      const counts = await res.json();
+      // Update all counts from server
+      document.querySelectorAll('.reaction-btn').forEach(b => {
+        const e = b.getAttribute('data-emoji');
+        const c = b.querySelector('.reaction-count');
+        if (c && e) c.textContent = counts[e] ?? 0;
+      });
+      // Save reaction to localStorage
+      const reacted = JSON.parse(localStorage.getItem(REACTED_KEY) ?? '[]');
+      reacted.push(emoji);
+      localStorage.setItem(REACTED_KEY, JSON.stringify(reacted));
+      // Show thanks
+      const thanks = document.getElementById('reactionsThanks');
+      if (thanks) { thanks.style.display = 'block'; }
+    }
+  } catch {
+    // Revert on error
+    countEl.textContent = current;
+    btn.classList.remove('reacted');
+    btn.disabled = false;
+  }
+}
+
+// Load counts on page load
+loadCounts();
+
+// Mark already reacted
+const alreadyReacted = JSON.parse(localStorage.getItem(REACTED_KEY) ?? '[]');
+document.querySelectorAll('.reaction-btn').forEach(btn => {
+  const emoji = btn.getAttribute('data-emoji');
+  if (emoji && alreadyReacted.includes(emoji)) {
+    btn.classList.add('reacted');
+    btn.disabled = true;
+  }
+  btn.addEventListener('click', () => {
+    if (!btn.disabled) react(emoji, btn);
+  });
+});
+</script>
