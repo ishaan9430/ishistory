@@ -4,7 +4,6 @@ import Cosmos from '../../components/Cosmos.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import { series as allSeries } from '../../data/series.js';
-import ListenButton from '../../components/ListenButton.astro';
 import AudioPlayer from '../../components/AudioPlayer.astro';
 import Reactions from '../../components/Reactions.astro';
 import Comments from '../../components/Comments.astro';
@@ -41,7 +40,7 @@ const nextSlug = nextPage?.file.split('/').pop()?.replace('.md','');
 const prevUrl = prevPage ? `/${seriesKey}/${prevSlug}/` : undefined;
 const nextUrl = nextPage ? `/${seriesKey}/${nextSlug}/` : undefined;
 
-// Related episodes â€” same part_label, exclude current
+// Related episodes — same part_label, exclude current
 const related = sorted
   .filter(p => {
     const s = p.file.split('/').pop()?.replace('.md','');
@@ -49,7 +48,7 @@ const related = sorted
   })
   .slice(0, 3);
 
-// Reading time â€” estimate from raw content
+// Reading time — estimate from raw content
 const rawBody = typeof page.rawContent === 'function' ? page.rawContent() : '';
 const wordCount = rawBody.trim().split(/\s+/).length;
 const readingTime = Math.max(1, Math.round(wordCount / 200));
@@ -58,7 +57,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 ---
 
 <Base
-  title={`${fm.title} â€” ishistory`}
+  title={`${fm.title} — ishistory`}
   description={fm.description ?? ''}
   ogType="article"
   publishedTime={fm.date ? String(fm.date) : undefined}
@@ -74,7 +73,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   box-shadow: 0 0 8px rgba(200,151,58,0.45);
 }
 
-/* â”€â”€ HERO â”€â”€ */
+/* —— HERO —— */
 .ep-hero {
   padding: 7rem 3rem 4rem;
   background: linear-gradient(160deg, #0d0b10 0%, #16121a 55%, #080a0d 100%);
@@ -160,7 +159,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 .ep-share-btn:hover { border-color: #c8973a; color: #c8973a; }
 .ep-share-btn.copied { border-color: #5a9; color: #5a9; }
 
-/* â”€â”€ READING BAR â”€â”€ */
+/* —— READING BAR —— */
 .ep-reading-bar {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.9rem 3rem;
@@ -177,7 +176,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   letter-spacing: 0.1em; color: #9a8f7e; margin-left: auto;
 }
 
-/* â”€â”€ TOC â”€â”€ */
+/* —— TOC —— */
 .ep-toc-wrap {
   background: rgba(200,151,58,0.04);
   border: 1px solid rgba(200,151,58,0.12);
@@ -224,7 +223,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   font-size: 0.92rem;
 }
 
-/* â”€â”€ ARTICLE â”€â”€ */
+/* —— ARTICLE —— */
 .ep-layout {
   background: #f5ede0; min-height: 60vh; position: relative; z-index: 1;
 }
@@ -267,7 +266,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 }
 .ep-article :global(a:hover) { color: #c4622a; }
 
-/* â”€â”€ RELATED â”€â”€ */
+/* —— RELATED —— */
 .ep-related {
   background: #0d0b10; padding: 3rem;
   border-top: 1px solid rgba(200,151,58,0.09);
@@ -317,7 +316,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   color: #564b3c; letter-spacing: 0.1em;
 }
 
-/* â”€â”€ PREV/NEXT NAV â”€â”€ */
+/* —— PREV/NEXT NAV —— */
 .ep-nav {
   background: #0d0b10; padding: 3rem;
   display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
@@ -343,7 +342,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 }
 .ep-empty-nav { padding: 2rem; }
 
-/* â”€â”€ BACK TO TOP â”€â”€ */
+/* —— BACK TO TOP —— */
 #backToTop {
   position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
   width: 42px; height: 42px;
@@ -385,7 +384,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
   <div class="ep-hero-bg-numeral">{fm.roman}</div>
   <div class="ep-hero-inner">
     <div class="ep-meta-row">
-      {fm.roman && <><span class="ep-episode-label">Episode {fm.roman}</span><span class="ep-sep">Â·</span></>}
+      {fm.roman && <><span class="ep-episode-label">Episode {fm.roman}</span><span class="ep-sep">·</span></>}
       {fm.tag && <span class="ep-tag-badge">{fm.tag}</span>}
       {dateStr && <span class="ep-date">{dateStr}</span>}
       <span class="ep-read-time">{readingTime} min read</span>
@@ -395,7 +394,6 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     {fm.part_label && <div class="ep-part-badge">{fm.part_label}</div>}
     <div class="ep-hero-actions">
       <button class="ep-share-btn" id="shareBtn">Share Episode</button>
-      <ListenButton />
     </div>
   </div>
 </section>
@@ -416,7 +414,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 <div class="ep-toc-wrap" id="tocWrap" style="display:none">
   <button class="ep-toc-toggle" id="tocToggle">
     <span class="ep-toc-label">Table of Contents</span>
-    <span class="ep-toc-arrow">â–¾</span>
+    <span class="ep-toc-arrow">▾</span>
   </button>
   <ul class="ep-toc-list" id="tocList"></ul>
 </div>
@@ -451,20 +449,20 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 
 <Reactions slug={slug} series={seriesKey} />
 
-<Comments slug={slug} series={seriesKey} />
-
 <Newsletter source={`episode:${seriesKey}`} />
+
+<Comments slug={slug} series={seriesKey} />
 
 <div class="ep-nav">
   {prevPage ? (
     <a href={prevUrl} class="ep-nav-btn prev">
-      <div class="ep-nav-label">â† Previous</div>
+      <div class="ep-nav-label">← Previous</div>
       <div class="ep-nav-title">{prevPage.frontmatter.title}</div>
     </a>
   ) : <div class="ep-empty-nav"></div>}
   {nextPage ? (
     <a href={nextUrl} class="ep-nav-btn next">
-      <div class="ep-nav-label">Next â†’</div>
+      <div class="ep-nav-label">Next ←’</div>
       <div class="ep-nav-title">{nextPage.frontmatter.title}</div>
     </a>
   ) : <div class="ep-empty-nav"></div>}
@@ -473,10 +471,10 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 <Footer />
 
 <!-- Back to top -->
-<button id="backToTop" aria-label="Back to top">â†‘</button>
+<button id="backToTop" aria-label="Back to top">←‘</button>
 
 <script define:vars={{ prevUrl, nextUrl, slug, seriesKey }}>
-  // â”€â”€ PROGRESS BAR â”€â”€
+  // —— PROGRESS BAR ——
   const bar = document.getElementById('progressBar');
   const pct = document.getElementById('readingPct');
   const article = document.getElementById('epArticle');
@@ -493,14 +491,14 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     if (backToTop) backToTop.classList.toggle('visible', window.scrollY > 600);
   }, { passive: true });
 
-  // â”€â”€ BACK TO TOP â”€â”€
+  // —— BACK TO TOP ——
   backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  // â”€â”€ MARK AS READ (localStorage) â”€â”€
+  // —— MARK AS READ (localStorage) ——
   const readKey = `read:${seriesKey}:${slug}`;
   localStorage.setItem(readKey, '1');
 
-  // â”€â”€ TABLE OF CONTENTS â”€â”€
+  // —— TABLE OF CONTENTS ——
   const headings = article?.querySelectorAll('h2, h3');
   const tocWrap = document.getElementById('tocWrap');
   const tocList = document.getElementById('tocList');
@@ -531,7 +529,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     });
   }
 
-  // â”€â”€ SHARE â”€â”€
+  // —— SHARE ——
   document.getElementById('shareBtn')?.addEventListener('click', () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('shareBtn');
@@ -542,7 +540,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
     });
   });
 
-  // â”€â”€ KEYBOARD NAV â”€â”€
+  // —— KEYBOARD NAV ——
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft' && prevUrl) window.location.href = prevUrl;
     if (e.key === 'ArrowRight' && nextUrl) window.location.href = nextUrl;
