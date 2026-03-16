@@ -19,7 +19,6 @@ export async function getStaticPaths() {
       return { params: { seriesKey, slug }, props: { page } };
     });
 }
-
 const { seriesKey, slug } = Astro.params;
 const { page } = Astro.props;
 const fm = page.frontmatter;
