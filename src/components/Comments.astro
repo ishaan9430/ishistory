@@ -238,6 +238,15 @@ const episodeSlug = `${series}/${slug}`;
 <script define:vars={{ episodeSlug }}>
 const API = `/api/comments?slug=${encodeURIComponent(episodeSlug)}`;
 
+function esc(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function formatDate(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -261,13 +270,13 @@ function renderComments(comments) {
 
   list.innerHTML = comments.map(c => `
     <div class="comment-card">
-      <div class="comment-avatar">${c.name.charAt(0)}</div>
+      <div class="comment-avatar">${esc(c.name.charAt(0))}</div>
       <div class="comment-body">
         <div class="comment-meta">
-          <span class="comment-name">${c.name}</span>
+          <span class="comment-name">${esc(c.name)}</span>
           <span class="comment-date">${formatDate(c.created_at)}</span>
         </div>
-        <p class="comment-text">${c.message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+        <p class="comment-text">${esc(c.message)}</p>
       </div>
     </div>
   `).join('');
@@ -327,7 +336,6 @@ form?.addEventListener('submit', async (e) => {
     if (data.success) {
       form.style.display = 'none';
       successEl.style.display = 'flex';
-      // Reload comments to show the new one
       await loadComments();
     } else {
       errorEl.textContent = data.error ?? 'Something went wrong.';
