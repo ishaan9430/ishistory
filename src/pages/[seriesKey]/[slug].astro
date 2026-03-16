@@ -391,7 +391,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 <div class="ep-toc-wrap" id="tocWrap" style="display:none">
   <button class="ep-toc-toggle" id="tocToggle">
     <span class="ep-toc-label">Table of Contents</span>
-    <span class="ep-toc-arrow">v</span>
+    <span class="ep-toc-arrow">▾</span>
   </button>
   <ul class="ep-toc-list" id="tocList"></ul>
 </div>
@@ -446,8 +446,7 @@ const dateStr = fm.date ? new Date(fm.date).toLocaleDateString('en-GB', { day: '
 
 <Footer />
 
-<button id="backToTop" aria-label="Back to top">^</button>
-
+<button id="backToTop" aria-label="Back to top">↑</button>
 <script define:vars={{ prevUrl, nextUrl, slug, seriesKey }}>
   const bar = document.getElementById('progressBar');
   const pct = document.getElementById('readingPct');
